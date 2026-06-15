@@ -37,6 +37,7 @@ document.addEventListener('DOMContentLoaded', () => {
 ───────────────────────────────────── */
 let allProducts   = [];
 let activeFilters = { generos: [], colores: [], categoria: 'all', q: '' };
+let userFavorites = [];
 
 /* ─────────────────────────────────────
    Carga de productos
@@ -49,6 +50,15 @@ async function loadProducts(initialQ = null, initialCat = null) {
   try {
     const res  = await window.Api.obtenerProductos();
     allProducts = res.payload || [];
+
+    if (window.Auth.isLoggedIn()) {
+      try {
+        const favsRes = await window.Api.obtenerFavoritos(window.Auth.getUserId());
+        if (favsRes && favsRes.payload) {
+          userFavorites = favsRes.payload.map(f => String(f.id_producto || f.idProducto || f.id));
+        }
+      } catch (e) { /* silencioso */ }
+    }
 
     buildColorFilterOptions(allProducts);
 
@@ -139,11 +149,17 @@ function renderGrid() {
           await window.Api.eliminarFavorito(idUsuario, idProducto);
           btn.classList.remove('active');
           btn.innerHTML = window.App.SVG.heart(false);
+          btn.setAttribute('aria-label', "Agregar a favoritos");
+          btn.setAttribute('title', "Agregar a favoritos");
+          userFavorites = userFavorites.filter(id => id !== String(idProducto));
           window.App.showToast('Eliminado de favoritos');
         } else {
           await window.Api.agregarFavorito(idProducto, idUsuario);
           btn.classList.add('active');
           btn.innerHTML = window.App.SVG.heart(true);
+          btn.setAttribute('aria-label', "Eliminar de favoritos");
+          btn.setAttribute('title', "Eliminar de favoritos");
+          if (!userFavorites.includes(String(idProducto))) userFavorites.push(String(idProducto));
           window.App.showToast('Agregado a favoritos', 'success');
         }
       } catch {
@@ -157,6 +173,9 @@ function renderProductCard(p) {
   const precio   = window.App.formatPrice(p.precio);
   const sinStock = p.stock === 0;
   const isLogged = window.Auth.isLoggedIn();
+  const isFav    = userFavorites.includes(String(p.idProducto));
+  const favClass = isFav ? 'product-card__fav-btn active' : 'product-card__fav-btn';
+  const favIcon  = window.App.SVG.heart(isFav);
 
   return `
     <article class="product-card" data-id="${p.idProducto}" role="listitem" tabindex="0"
@@ -169,9 +188,10 @@ function renderProductCard(p) {
         }
         ${sinStock ? `<span class="product-card__out-badge" aria-label="Sin stock">Sin stock</span>` : ''}
         ${isLogged ? `
-          <button class="product-card__fav-btn" data-product-id="${p.idProducto}"
-                  aria-label="Agregar a favoritos" title="Agregar a favoritos">
-            ${window.App.SVG.heart(false)}
+          <button class="${favClass}" data-product-id="${p.idProducto}"
+                  aria-label="${isFav ? 'Eliminar de favoritos' : 'Agregar a favoritos'}" 
+                  title="${isFav ? 'Eliminar de favoritos' : 'Agregar a favoritos'}">
+            ${favIcon}
           </button>` : ''}
       </div>
       <div class="product-card__body">

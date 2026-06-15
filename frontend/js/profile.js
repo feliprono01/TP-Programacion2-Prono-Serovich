@@ -280,17 +280,40 @@ async function loadFavorites() {
 
   try {
     const res = await window.Api.obtenerFavoritos(userId);
+    const favIds = (res && res.payload) ? res.payload : [];
 
-    loader.classList.add('hidden');
-
-    const favs = (res && res.payload) ? res.payload : [];
-
-    if (!Array.isArray(favs) || favs.length === 0) {
+    if (!Array.isArray(favIds) || favIds.length === 0) {
+      loader.classList.add('hidden');
       empty.classList.remove('hidden');
       return;
     }
 
-    grid.innerHTML = favs.map(fav => buildFavCard(fav)).join('');
+    // Pedir los datos de cada producto favorito individualmente
+    const favProducts = [];
+    await Promise.all(favIds.map(async (fav) => {
+      const idStr = String(fav.id_producto || fav.idProducto || fav.id);
+      try {
+        const prodRes = await window.Api.obtenerDatosProducto(idStr);
+        // Si tiene payload y al menos una fila (tiene inventario), lo mostramos
+        if (prodRes && prodRes.payload && prodRes.payload.length > 0) {
+          const prodData = prodRes.payload[0];
+          // Le inyectamos el ID porque obtenerDatosProducto no lo devuelve
+          prodData.idProducto = idStr;
+          favProducts.push(prodData);
+        }
+      } catch (e) {
+        // Si falla (ej. borrado o sin inventario), simplemente no se muestra
+      }
+    }));
+
+    loader.classList.add('hidden');
+
+    if (favProducts.length === 0) {
+      empty.classList.remove('hidden');
+      return;
+    }
+
+    grid.innerHTML = favProducts.map(prod => buildFavCard(prod)).join('');
     grid.classList.remove('hidden');
 
     bindFavCardEvents();
@@ -311,17 +334,21 @@ async function loadFavorites() {
   }
 }
 
+window.handleFavImgError = function(img) {
+  img.outerHTML = `<div class="fav-card__img-placeholder">${buildImgSVG()}</div>`;
+};
+
 function buildFavCard(fav) {
-  const id        = fav.id_producto   || fav.id      || '';
-  const nombre    = fav.nombre        || fav.name     || 'Producto';
+  const id        = fav.id_producto   || fav.idProducto || fav.id      || '';
+  const nombre    = fav.nombre        || fav.producto   || fav.name     || 'Producto';
   const categoria = fav.categoria     || fav.category || '';
   const precio    = fav.precio        || fav.price    || 0;
-  const imagen    = fav.imagen        || fav.image    || '';
+  const imagen    = fav.imagen        || fav.ulrImagen || fav.image    || '';
   const stock     = (fav.stock !== undefined) ? fav.stock : 1;
   const hayStock  = stock > 0;
 
   const imgHTML = imagen
-    ? `<img src="${imagen}" alt="${nombre}" loading="lazy" onerror="this.parentElement.innerHTML='<div class=\\'fav-card__img-placeholder\\'>${buildImgSVG()}</div>'" />`
+    ? `<img src="${imagen}" alt="${nombre}" loading="lazy" onerror="window.handleFavImgError(this)" />`
     : `<div class="fav-card__img-placeholder">${buildImgSVG()}</div>`;
 
   return `

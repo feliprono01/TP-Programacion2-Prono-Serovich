@@ -308,7 +308,21 @@ function handlePay(e) {
   payBtn.textContent = 'Procesando…';
 
   // Simular demora de procesamiento
-  setTimeout(() => {
+  setTimeout(async () => {
+    const idUsuario = window.Auth.getUserId();
+    if (idUsuario && cartItems.length > 0) {
+      try {
+        // Vaciar carrito llamando a eliminar por cada item
+        for (const item of cartItems) {
+          await window.Api.eliminarProductoCarrito(idUsuario, item.idInventario);
+        }
+        cartItems = [];
+        window.dispatchEvent(new CustomEvent('cart-updated')); // Actualizar globito del header
+      } catch (err) {
+        console.error('Error al vaciar carrito tras el pago:', err);
+      }
+    }
+
     const session = window.Auth.get();
     const nombre = session ? session.nombre : 'Cliente';
     document.getElementById('success-name').textContent = nombre;
