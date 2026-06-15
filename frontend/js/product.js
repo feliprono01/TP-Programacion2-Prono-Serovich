@@ -109,11 +109,9 @@ function renderProduct() {
     document.getElementById('detail-out-label').classList.remove('hidden');
   }
 
-  // Colores únicos
+  // Colores únicos (renderColors se encarga de llamar renderTalles con el filtro correcto,
+  // o mostrar el placeholder si hay múltiples colores y ninguno seleccionado)
   renderColors();
-
-  // Talles
-  renderTalles();
 
   // Cuotas
   initCuotas(p.precio);
@@ -138,21 +136,27 @@ function renderColors() {
 
   if (coloresUnicos.length === 0) {
     document.getElementById('color-section').style.display = 'none';
+    // Sin colores definidos: mostrar talles directamente (sin filtro)
+    renderTalles(null);
     return;
   }
 
   if (coloresUnicos.length === 1) {
-    // Un solo color: mostrarlo como info, no como selector
+    // Un solo color: mostrarlo como info y cargar sus talles automáticamente
     const c = coloresUnicos[0];
     container.innerHTML = `
       <div class="color-display">
         <span class="color-swatch" style="background-color:${colorToCss(c.color)};" title="${c.color}"></span>
         <span>${c.color}</span>
       </div>`;
+    renderTalles(c.color);
     return;
   }
 
   // Múltiples colores: chips seleccionables
+  // Bloquear talles hasta que se elija un color
+  showTallesPlaceholder();
+
   container.innerHTML = coloresUnicos.map(c => `
     <button class="talle-chip" data-color="${c.color}" aria-label="Color ${c.color}"
             style="display:flex;align-items:center;gap:6px;">
@@ -168,6 +172,27 @@ function renderColors() {
       renderTalles(btn.dataset.color);
     });
   });
+}
+
+/**
+ * Muestra un estado de placeholder en la sección de talles
+ * mientras el usuario no haya elegido un color.
+ */
+function showTallesPlaceholder() {
+  const container = document.getElementById('talle-options');
+  const infoEl    = document.getElementById('talle-info');
+  if (container) {
+    container.innerHTML = `
+      <p style="
+        color: var(--color-mute);
+        font-size: var(--fs-button);
+        font-style: italic;
+        padding: var(--spacing-xs) 0;
+      ">Primero seleccioná un color</p>`;
+  }
+  if (infoEl) infoEl.textContent = '';
+  selectedTalle = null;
+  updateCartButton();
 }
 
 /* ─── Talles ─── */
