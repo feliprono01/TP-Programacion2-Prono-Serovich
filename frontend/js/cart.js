@@ -312,8 +312,20 @@ function handlePay(e) {
     const idUsuario = window.Auth.getUserId();
     if (idUsuario && cartItems.length > 0) {
       try {
-        // Vaciar carrito llamando a eliminar por cada item
+        // Procesar compra: descontar stock y vaciar carrito por cada item
         for (const item of cartItems) {
+          // Obtener el stock actual del producto
+          const resProducto = await window.Api.obtenerDatosProducto(item.idProducto);
+          if (resProducto && resProducto.codigo === 200 && resProducto.payload) {
+            const inventarioData = resProducto.payload.find(i => i.idInventario === item.idInventario);
+            if (inventarioData) {
+              const stockActual = Number(inventarioData.stock);
+              const nuevoStock = stockActual > 0 ? stockActual - 1 : 0;
+              // Descontar stock
+              await window.Api.modificarStock(item.idInventario, nuevoStock);
+            }
+          }
+          // Eliminar del carrito
           await window.Api.eliminarProductoCarrito(idUsuario, item.idInventario);
         }
         cartItems = [];
