@@ -241,6 +241,10 @@ function handleCargarProducto(e) {
   pendingProducto  = { nombre, descripcion, precio, genero, id_categoria, imagen: imagen || '' };
   pendingVariantes = [];
 
+  // Actualizar las opciones de talles dinámicamente según la categoría elegida
+  renderMultiselectOptions('inv', getTallesForCategory(pendingProducto.id_categoria));
+  resetMultiselect('inv');
+
   // Mostrar Paso 2
   document.getElementById('inventario-card').classList.remove('hidden');
   document.getElementById('inventario-card').scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -637,7 +641,11 @@ async function loadProductForEdit(productId) {
 
     // Cargar categorías y seleccionar la actual
     await loadCategorias('e-categoria');
-    document.getElementById('e-categoria').value = prod.idCategoria || '';
+    const idCat = prod.idCategoria || prod.id_categoria || '';
+    document.getElementById('e-categoria').value = idCat;
+
+    // Actualizar dinámicamente las opciones de talle en base a la categoría actual
+    renderMultiselectOptions('einv', getTallesForCategory(idCat));
 
     // Renderizar inventario
     renderEditInventario(rows, productId);
@@ -890,7 +898,31 @@ function setLoadingBtn(btn, loading, text) {
 /* ════════════════════════════════════════
    MULTISELECT & COLOR SELECT HELPERS
    ════════════════════════════════════════ */
-const TALLES_LIST = ['XS', 'S', 'M', 'L', 'XL', 'XXL', '3XL', '34', '36', '38', '40', '42', '44', '46'];
+const TALLES_ROPA = ['XS', 'S', 'M', 'L', 'XL', 'XXL', '3XL', '34', '36', '38', '40', '42', '44', '46'];
+const TALLES_CALZADO = Array.from({length: 10}, (_, i) => String(35 + i)); // 35 al 44
+
+function isCalzadoCategory(id_categoria) {
+  if (!categoriasCache) return false;
+  const cat = categoriasCache.find(c => String(c.id_categoria) === String(id_categoria));
+  if (!cat) return false;
+  const n = cat.nombre.toLowerCase();
+  return n.includes('calzado') || n.includes('zapatilla');
+}
+
+function getTallesForCategory(id_categoria) {
+  return isCalzadoCategory(id_categoria) ? TALLES_CALZADO : TALLES_ROPA;
+}
+
+function renderMultiselectOptions(prefix, tallesArray) {
+  const optionsDiv = document.getElementById(`${prefix}-talles-options`);
+  if (!optionsDiv) return;
+  optionsDiv.innerHTML = tallesArray.map(talle => `
+    <label class="multiselect-item" onclick="event.stopPropagation();">
+      <input type="checkbox" value="${talle}">
+      <span>${talle}</span>
+    </label>
+  `).join('');
+}
 
 function initMultiselectsAndColors() {
   setupMultiselect('inv');
@@ -908,6 +940,15 @@ function initMultiselectsAndColors() {
       }
     });
   });
+
+  // Listener para cuando se cambia la categoría en Modificar
+  const eCategoria = document.getElementById('e-categoria');
+  if (eCategoria) {
+    eCategoria.addEventListener('change', (e) => {
+      renderMultiselectOptions('einv', getTallesForCategory(e.target.value));
+      resetMultiselect('einv');
+    });
+  }
 }
 
 function setupMultiselect(prefix) {
@@ -917,13 +958,8 @@ function setupMultiselect(prefix) {
   
   if (!optionsDiv || !trigger || !dropdown) return;
 
-  // Renderizar la lista de checkboxes
-  optionsDiv.innerHTML = TALLES_LIST.map(talle => `
-    <label class="multiselect-item" onclick="event.stopPropagation();">
-      <input type="checkbox" value="${talle}">
-      <span>${talle}</span>
-    </label>
-  `).join('');
+  // Render inicial por defecto a ropa
+  renderMultiselectOptions(prefix, TALLES_ROPA);
 
   // Toggle dropdown
   trigger.addEventListener('click', (e) => {

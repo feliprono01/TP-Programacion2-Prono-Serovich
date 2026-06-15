@@ -254,7 +254,7 @@
 
 .inventario-inputs {
   display: grid;
-  grid-template-columns: 1fr 1fr 100px;
+  grid-template-columns: 1fr 1fr 140px;
   gap: var(--spacing-sm);
 }
 
@@ -1092,9 +1092,11 @@
   border-radius: var(--radius-sm);
   box-shadow: var(--shadow-md);
   z-index: 20;
-  max-height: 200px;
+  max-height: 220px;
   overflow-y: auto;
   padding: var(--spacing-xs);
+  padding-bottom: 8px;
+  box-sizing: border-box;
   display: flex;
   flex-direction: column;
   gap: 2px;
