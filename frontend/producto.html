@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Detalle de producto — Lana &amp; Lino" />
+  <title>Cargando producto… — Lana &amp; Lino</title>
+
+  <link rel="stylesheet" href="css/tokens.css" />
+  <link rel="stylesheet" href="css/global.css" />
+  <link rel="stylesheet" href="css/components.css" />
+  <link rel="stylesheet" href="css/product.css" />
+</head>
+<body>
+
+  <div id="header-mount"></div>
+
+  <main class="page-content">
+    <div class="container">
+
+      <!-- Breadcrumb -->
+      <nav class="product-breadcrumb" aria-label="Ubicación">
+        <a href="index.html">Inicio</a>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+        <span id="breadcrumb-categoria">Productos</span>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+        <span id="breadcrumb-nombre">Cargando…</span>
+      </nav>
+
+      <!-- Loader inicial -->
+      <div id="product-loader" class="product-loader" role="status" aria-live="polite">
+        <div class="spinner" aria-hidden="true"></div>
+      </div>
+
+      <!-- Contenido del producto (oculto hasta cargar) -->
+      <div id="product-content" class="product-layout hidden">
+
+        <!-- ── Imagen ── -->
+        <div class="product-image-panel">
+          <div id="product-image-container">
+            <!-- inyectado por JS -->
+          </div>
+        </div>
+
+        <!-- ── Detalles ── -->
+        <div class="product-info-panel">
+
+          <!-- Meta: categoría + género -->
+          <div class="product-meta">
+            <span class="product-category-badge" id="detail-categoria"></span>
+            <span class="product-gender-badge" id="detail-genero"></span>
+          </div>
+
+          <!-- Nombre -->
+          <h1 class="product-title" id="detail-nombre"></h1>
+
+          <!-- Descripción -->
+          <p class="product-description" id="detail-descripcion"></p>
+
+          <div class="product-divider"></div>
+
+          <!-- Precio + etiqueta sin stock global -->
+          <div class="product-price-block">
+            <span class="product-price" id="detail-precio"></span>
+            <span class="product-out-label hidden" id="detail-out-label" aria-live="polite">Sin stock</span>
+          </div>
+
+          <!-- ── Selector de Color ── -->
+          <div id="color-section">
+            <p class="product-section-label">Color</p>
+            <div id="color-options" class="talle-options"></div>
+          </div>
+
+          <!-- ── Selector de Talle ── -->
+          <div id="talle-section">
+            <p class="product-section-label">Talle</p>
+            <div id="talle-options" class="talle-options" role="group" aria-label="Seleccionar talle"></div>
+            <p class="talle-info" id="talle-info">Seleccioná un talle para ver el stock disponible.</p>
+          </div>
+
+          <div class="product-divider"></div>
+
+          <!-- ── Cuotas ── -->
+          <div class="cuotas-selector" id="cuotas-section">
+            <p class="product-section-label" style="margin-bottom: var(--spacing-sm);">Financiación</p>
+            <div class="cuotas-options" role="group" aria-label="Seleccionar cuotas">
+              <button class="cuota-chip active" data-cuotas="1">1 cuota</button>
+              <button class="cuota-chip" data-cuotas="3">3 cuotas</button>
+              <button class="cuota-chip" data-cuotas="6">6 cuotas</button>
+              <button class="cuota-chip" data-cuotas="9">9 cuotas</button>
+              <button class="cuota-chip" data-cuotas="12">12 cuotas</button>
+            </div>
+            <p class="cuotas-result" id="cuotas-result" aria-live="polite"></p>
+          </div>
+
+          <div class="product-divider"></div>
+
+          <!-- ── Acciones ── -->
+          <div class="product-actions">
+            <button
+              class="btn btn-primary btn-add-cart"
+              id="btn-add-cart"
+              disabled
+              aria-label="Agregar al carrito"
+            >
+              Agregar al carrito
+            </button>
+            <button
+              class="btn btn-ghost btn-fav hidden"
+              id="btn-fav"
+              aria-label="Agregar a favoritos"
+            >
+              <!-- ícono + texto inyectado por JS -->
+            </button>
+          </div>
+
+          <!-- Aviso para usuarios no logueados -->
+          <p id="login-hint" class="hidden"
+             style="font-size:var(--fs-small);color:var(--color-mute);text-align:center;">
+            <a href="login.html" style="color:var(--color-ink);font-weight:600;">Iniciá sesión</a>
+            para agregar productos al carrito y guardar favoritos.
+          </p>
+
+        </div><!-- /product-info-panel -->
+      </div><!-- /product-layout -->
+
+      <!-- Error state -->
+      <div id="product-error" class="empty-state hidden" role="alert">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        <p class="empty-state__title">Producto no encontrado</p>
+        <p class="empty-state__subtitle">Este producto no existe o fue eliminado.</p>
+        <a href="index.html" class="btn btn-ghost">Volver al catálogo</a>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="global-footer" role="contentinfo">
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <span class="brand-name-sm">Lana &amp; Lino</span>
+        <p>Moda con estilo, calidad y pasión.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Contacto</h4>
+        <ul>
+          <li>
+            <a href="mailto:felipeprono@gmail.com">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+              felipeprono@gmail.com
+            </a>
+          </li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Redes sociales</h4>
+        <ul>
+          <li><a href="#"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg> @lanaylino</a></li>
+          <li><a href="#"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg> Lana &amp; Lino</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2025 Lana &amp; Lino.</p>
+      <p>Desarrollado por <strong>Felipe Prono</strong> y <strong>Emilio Serovich</strong></p>
+    </div>
+  </footer>
+
+  <script src="js/auth.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/product.js"></script>
+</body>
+</html>

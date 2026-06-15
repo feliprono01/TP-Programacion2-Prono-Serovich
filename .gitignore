@@ -1,0 +1,25 @@
+# Variables de entorno (¡NUNCA subir!)
+.env
+.env.local
+.env.production
+
+# Dependencias Node.js
+node_modules/
+backend-2026-1-er-cuatrimestre/node_modules/
+
+# Logs
+*.log
+npm-debug.log*
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editor
+.vscode/
+.idea/
+
+# Build artifacts
+dist/
+build/

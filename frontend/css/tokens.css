@@ -1,0 +1,85 @@
+/* ============================================================
+   LANA & LINO — Design Tokens
+   Fuente: design.md
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+
+/* ── Modo Claro (default) ── */
+:root {
+  /* Colors */
+  --color-canvas:   #ffffff;
+  --color-surface:  #f5f5f5;
+  --color-ink:      #111111;
+  --color-hairline: #e5e5e5;
+  --color-mute:     #707072;
+  --color-success:  #007d48;
+  --color-disabled: #d30005;
+
+  /* Accent (complementa el sistema monocromo) */
+  --color-accent:   #111111;
+  --color-accent-hover: #333333;
+
+  /* Typography sizes */
+  --fs-display:     32px;
+  --fs-heading:     24px;
+  --fs-body:        16px;
+  --fs-button:      14px;
+  --fs-small:       12px;
+
+  /* Font weights */
+  --fw-regular: 400;
+  --fw-semibold: 600;
+  --fw-bold: 700;
+
+  /* Line heights */
+  --lh-display: 1.2;
+  --lh-heading: 1.3;
+  --lh-body:    1.5;
+
+  /* Font family */
+  --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+
+  /* Spacing (escala 8px) */
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 48px;
+
+  /* Border radius */
+  --radius-pill:    30px;
+  --radius-search:  24px;
+  --radius-card:    0px;
+  --radius-sm:      6px;
+  --radius-md:      12px;
+
+  /* Header */
+  --header-height:  68px;
+
+  /* Transitions */
+  --transition-fast: 150ms ease;
+  --transition-mid:  250ms ease;
+  --transition-slow: 400ms ease;
+
+  /* Shadows */
+  --shadow-sm:  0 1px 3px rgba(0,0,0,.08);
+  --shadow-md:  0 4px 16px rgba(0,0,0,.10);
+  --shadow-lg:  0 8px 32px rgba(0,0,0,.14);
+}
+
+/* ── Modo Oscuro ── */
+[data-theme="dark"] {
+  --color-canvas:   #121212;
+  --color-surface:  #1e1e1e;
+  --color-ink:      #ffffff;
+  --color-hairline: #333333;
+  --color-mute:     #a0a0a0;
+
+  --color-accent:       #ffffff;
+  --color-accent-hover: #cccccc;
+
+  --shadow-sm:  0 1px 3px rgba(0,0,0,.30);
+  --shadow-md:  0 4px 16px rgba(0,0,0,.40);
+  --shadow-lg:  0 8px 32px rgba(0,0,0,.55);
+}

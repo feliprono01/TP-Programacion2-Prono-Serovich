@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Panel de administración de Lana & Lino. Gestioná los productos del catálogo." />
+  <title>Lana &amp; Lino — Admin</title>
+
+  <link rel="stylesheet" href="css/tokens.css" />
+  <link rel="stylesheet" href="css/global.css" />
+  <link rel="stylesheet" href="css/components.css" />
+  <link rel="stylesheet" href="css/admin.css" />
+</head>
+<body>
+
+<!-- ════ HEADER ════ -->
+<div id="header-mount"></div>
+
+<!-- ════ MAIN ════ -->
+<main class="page-content admin-page" id="admin-page">
+
+  <!-- ── Hero Admin ── -->
+  <section class="admin-hero">
+    <div class="admin-hero__inner container">
+      <div class="admin-hero__icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+      </div>
+      <div>
+        <h1 class="admin-hero__title">Panel de administración</h1>
+        <p class="admin-hero__subtitle">Cargá, buscá y modificá productos del catálogo.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Tabs ── -->
+  <div class="admin-tabs-wrap">
+    <div class="container">
+      <nav class="admin-tabs" role="tablist" aria-label="Secciones del panel">
+        <button class="admin-tab active" data-tab="cargar" id="tab-cargar"
+          role="tab" aria-selected="true" aria-controls="section-cargar">
+          Cargar producto
+        </button>
+        <button class="admin-tab" data-tab="modificar" id="tab-modificar"
+          role="tab" aria-selected="false" aria-controls="section-modificar">
+          Buscar &amp; Modificar
+        </button>
+      </nav>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════
+       SECCIÓN: CARGAR PRODUCTO
+       ════════════════════════════════════ -->
+  <section id="section-cargar" class="admin-section container"
+    role="tabpanel" aria-labelledby="tab-cargar">
+
+    <div class="admin-layout">
+
+      <!-- Columna del formulario -->
+      <div class="admin-form-col">
+
+        <!-- Encabezado de pasos -->
+        <div class="admin-form-header">
+          <div class="admin-form-header__icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          </div>
+          <div>
+            <p class="admin-form-header__title">Nuevo producto</p>
+            <p class="admin-form-header__sub">Paso 1 de 2 — Completá los datos del producto</p>
+          </div>
+          <div id="cargar-msg" class="admin-msg" role="alert" style="margin-left:auto;min-width:0"></div>
+        </div>
+
+        <form id="cargar-form" novalidate>
+
+          <!-- ── CARD 1: Identificación ── -->
+          <div class="admin-step-card">
+            <div class="admin-step-card__num" aria-hidden="true">1</div>
+            <div class="admin-step-card__content">
+              <p class="admin-step-card__title">
+                <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+                Identificación
+              </p>
+              <div class="form-group">
+                <label class="form-label" for="c-nombre">Nombre del producto</label>
+                <input class="form-input" type="text" id="c-nombre" name="nombre"
+                  placeholder="Ej: Remera oversize negra" required />
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="c-descripcion">Descripción</label>
+                <textarea class="form-input form-textarea" id="c-descripcion" name="descripcion"
+                  placeholder="Materiales, corte, estilo…" rows="3" required></textarea>
+              </div>
+            </div>
+          </div>
+
+          <!-- ── CARD 2: Precio & Categoría ── -->
+          <div class="admin-step-card">
+            <div class="admin-step-card__num" aria-hidden="true">2</div>
+            <div class="admin-step-card__content">
+              <p class="admin-step-card__title">
+                <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                Precio &amp; Categoría
+              </p>
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label" for="c-precio">Precio (ARS)</label>
+                  <div class="admin-price-input">
+                    <span class="admin-price-prefix">$</span>
+                    <input class="form-input admin-price-field" type="number" id="c-precio" name="precio"
+                      placeholder="0" min="0" step="1" required />
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="c-categoria">Categoría</label>
+                  <div class="admin-categoria-row">
+                    <select class="form-select" id="c-categoria" name="id_categoria" required>
+                      <option value="" disabled selected>Seleccioná…</option>
+                    </select>
+                    <button class="btn btn-ghost btn-sm" type="button" id="nueva-categoria-btn"
+                      title="Crear nueva categoría" aria-label="Crear nueva categoría">
+                      <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                      Nueva
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ── CARD 3: Género ── -->
+          <div class="admin-step-card">
+            <div class="admin-step-card__num" aria-hidden="true">3</div>
+            <div class="admin-step-card__content">
+              <p class="admin-step-card__title">
+                <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M12 12v8M9 18h6"/></svg>
+                Género
+              </p>
+              <div class="gender-selector" role="group" aria-label="Seleccionar género">
+                <label class="gender-option">
+                  <input type="radio" name="genero" value="Mujer" required />
+                  <span class="gender-option__pill">
+                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M12 12v8M9 18h6"/></svg>
+                    Mujer
+                  </span>
+                </label>
+                <label class="gender-option">
+                  <input type="radio" name="genero" value="Hombre" />
+                  <span class="gender-option__pill">
+                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="10" cy="14" r="4"/><line x1="21" y1="3" x2="15" y2="9"/><polyline points="15 3 21 3 21 9"/></svg>
+                    Hombre
+                  </span>
+                </label>
+                <label class="gender-option">
+                  <input type="radio" name="genero" value="Unisex" />
+                  <span class="gender-option__pill">
+                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="11" r="4"/><path d="M12 15v6M9 19h6"/></svg>
+                    Unisex
+                  </span>
+                </label>
+                <label class="gender-option">
+                  <input type="radio" name="genero" value="Niños" />
+                  <span class="gender-option__pill">
+                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 12l2 2 4-4"/><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20z"/></svg>
+                    Niños
+                  </span>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <!-- ── CARD 4: Imagen ── -->
+          <div class="admin-step-card">
+            <div class="admin-step-card__num admin-step-card__num--opt" aria-hidden="true">
+              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+            </div>
+            <div class="admin-step-card__content">
+              <p class="admin-step-card__title">
+                Imagen
+                <span class="admin-step-card__opt-badge">opcional</span>
+              </p>
+              <div class="admin-image-row">
+                <div class="form-group" style="flex:1;min-width:0">
+                  <input class="form-input" type="url" id="c-imagen" name="imagen"
+                    placeholder="https://…" />
+                  <span style="font-size:11px;color:var(--color-mute);margin-top:4px;display:block">URL pública de la imagen del producto.</span>
+                </div>
+                <div class="admin-img-preview" id="img-preview-wrap" aria-hidden="true">
+                  <div class="admin-img-preview__placeholder" id="img-preview-placeholder">
+                    <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                  </div>
+                  <img class="admin-img-preview__img hidden" id="img-preview" alt="Vista previa" />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Botón submit -->
+          <button class="btn btn-primary btn-block admin-submit-btn" type="submit" id="cargar-btn">
+            Guardar producto y agregar inventario
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          </button>
+
+        </form>
+
+        <!-- Card: Inventario (aparece luego de guardar el producto) -->
+        <div class="admin-card hidden" id="inventario-card" style="margin-top:0">
+          <div class="admin-card__header">
+            <div class="admin-card__icon admin-card__icon--success" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+            <div>
+              <p class="admin-card__title">Paso 2 — Agregar inventario</p>
+              <p class="admin-card__subtitle">Registrá cada combinación de talle, color y stock.</p>
+            </div>
+          </div>
+          <div class="admin-card__body">
+            <div id="inventario-msg" class="admin-msg" role="alert"></div>
+            <div id="inventario-list" class="inventario-list"></div>
+            <form id="inventario-form" class="inventario-row-form" novalidate>
+              <div class="inventario-inputs">
+                <div class="form-group">
+                  <label class="form-label" for="inv-talle">Talle</label>
+                  <input class="form-input" type="text" id="inv-talle" placeholder="XS, S, M, L, XL…" required />
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="inv-color">Color</label>
+                  <input class="form-input" type="text" id="inv-color" placeholder="Negro, Blanco…" required />
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="inv-stock">Stock</label>
+                  <input class="form-input" type="number" id="inv-stock" placeholder="0" min="0" step="1" value="10" required />
+                </div>
+              </div>
+              <button class="btn btn-secondary" type="submit" id="inv-add-btn">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                Agregar variante
+              </button>
+            </form>
+            <div class="inventario-actions">
+              <button class="btn btn-primary" type="button" id="finalizar-btn">✓ Finalizar y cargar otro</button>
+              <a href="index.html" class="btn btn-ghost">Ver catálogo</a>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /admin-form-col -->
+
+      <!-- Sidebar: Tips -->
+      <aside class="admin-sidebar">
+        <div class="admin-tip-card">
+          <p class="admin-tip-card__title">Cómo cargar un producto</p>
+          <ol class="admin-tip-list">
+            <li>Completá los datos básicos del producto.</li>
+            <li>Hacé clic en <strong>"Guardar producto"</strong>.</li>
+            <li>Agregá todas las combinaciones de <strong>talle + color + stock</strong> que correspondan.</li>
+            <li>Hacé clic en <strong>"Finalizar"</strong> para cargar otro o ir al catálogo.</li>
+          </ol>
+        </div>
+        <div class="admin-tip-card admin-tip-card--info">
+          <p class="admin-tip-card__title">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            Categorías
+          </p>
+          <p style="font-size:var(--fs-small);color:var(--color-mute);line-height:1.5;">
+            Si la categoría que necesitás no existe, usá el botón <strong>"+ Nueva"</strong> junto al selector para crearla.
+          </p>
+        </div>
+      </aside>
+
+    </div><!-- /admin-layout -->
+
+  </section>
+
+  <!-- ════════════════════════════════════
+       SECCIÓN: BUSCAR & MODIFICAR
+       ════════════════════════════════════ -->
+  <section id="section-modificar" class="admin-section container hidden"
+    role="tabpanel" aria-labelledby="tab-modificar">
+
+    <!-- Buscador -->
+    <div class="admin-search-bar">
+      <div class="admin-search-input-wrap">
+        <svg class="admin-search-icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input class="admin-search-input" type="search" id="mod-search-input"
+          placeholder="Buscá por nombre de producto…" autocomplete="off"
+          aria-label="Buscar producto para modificar" />
+        <button class="btn btn-primary btn-sm" id="mod-search-btn" type="button">
+          Buscar
+        </button>
+      </div>
+    </div>
+
+    <!-- Loader -->
+    <div class="loader hidden" id="mod-loader"><div class="spinner"></div></div>
+
+    <!-- Lista de resultados -->
+    <div id="mod-results" class="mod-results hidden"></div>
+
+    <!-- Estado vacío -->
+    <div id="mod-empty" class="empty-state hidden">
+      <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <p class="empty-state__title">Sin resultados</p>
+      <p class="empty-state__subtitle">Probá con otro nombre de producto.</p>
+    </div>
+
+    <!-- Estado inicial -->
+    <div id="mod-initial" class="mod-initial">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <p>Ingresá el nombre de un producto para buscarlo.</p>
+    </div>
+
+    <!-- ── Panel de edición (oculto hasta elegir un producto) ── -->
+    <div id="edit-panel" class="edit-panel hidden">
+
+      <div class="admin-layout">
+        <div class="admin-form-col">
+
+          <!-- Card: Editar datos del producto -->
+          <div class="admin-card">
+            <div class="admin-card__header">
+              <div class="admin-card__icon admin-card__icon--warning" aria-hidden="true">
+                <svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+              </div>
+              <div>
+                <p class="admin-card__title" id="edit-product-name">Editando producto</p>
+                <p class="admin-card__subtitle">Modificá los datos y guardá los cambios.</p>
+              </div>
+            </div>
+
+            <div class="admin-card__body">
+              <div id="edit-msg" class="admin-msg" role="alert"></div>
+
+              <form id="edit-form" novalidate>
+                <input type="hidden" id="edit-product-id" />
+
+                <div class="form-group">
+                  <label class="form-label" for="e-nombre">Nombre</label>
+                  <input class="form-input" type="text" id="e-nombre" name="nombre" required />
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label" for="e-descripcion">Descripción</label>
+                  <textarea class="form-input form-textarea" id="e-descripcion" name="descripcion" rows="3" required></textarea>
+                </div>
+
+                <div class="form-row">
+                  <div class="form-group">
+                    <label class="form-label" for="e-precio">Precio (ARS)</label>
+                    <input class="form-input" type="number" id="e-precio" name="precio" min="0" required />
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label" for="e-genero">Género</label>
+                    <select class="form-select" id="e-genero" name="genero" required>
+                      <option value="Hombre">Hombre</option>
+                      <option value="Mujer">Mujer</option>
+                      <option value="Unisex">Unisex</option>
+                      <option value="Niños">Niños</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label" for="e-categoria">Categoría</label>
+                  <select class="form-select" id="e-categoria" name="id_categoria" required>
+                    <option value="" disabled>Cargando…</option>
+                  </select>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label" for="e-imagen">URL de imagen</label>
+                  <input class="form-input" type="url" id="e-imagen" name="imagen" placeholder="https://..." />
+                </div>
+
+                <div class="admin-form-actions">
+                  <button class="btn btn-primary" type="submit" id="edit-save-btn">Guardar cambios</button>
+                  <button class="btn btn-ghost" type="button" id="edit-cancel-btn">Cancelar</button>
+                </div>
+              </form>
+            </div>
+          </div>
+
+          <!-- Card: Inventario del producto -->
+          <div class="admin-card" id="edit-inventario-card">
+            <div class="admin-card__header">
+              <div class="admin-card__icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+              </div>
+              <div>
+                <p class="admin-card__title">Inventario / Variantes</p>
+                <p class="admin-card__subtitle">Stock por talle y color. Podés modificar el stock de cada variante.</p>
+              </div>
+            </div>
+
+            <div class="admin-card__body">
+              <div id="edit-inventario-list" class="inventario-edit-list"></div>
+
+              <!-- Agregar nueva variante al producto existente -->
+              <div class="inventario-add-section">
+                <p class="inventario-add-title">Agregar nueva variante</p>
+                <form id="edit-inventario-form" class="inventario-row-form" novalidate>
+                  <div class="inventario-inputs">
+                    <div class="form-group">
+                      <label class="form-label" for="einv-talle">Talle</label>
+                      <input class="form-input" type="text" id="einv-talle" placeholder="XS, S, M…" required />
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label" for="einv-color">Color</label>
+                      <input class="form-input" type="text" id="einv-color" placeholder="Negro…" required />
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label" for="einv-stock">Stock</label>
+                      <input class="form-input" type="number" id="einv-stock" placeholder="0" min="0" value="10" required />
+                    </div>
+                  </div>
+                  <button class="btn btn-secondary" type="submit">
+                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+                    </svg>
+                    Agregar variante
+                  </button>
+                </form>
+              </div>
+
+            </div>
+          </div>
+
+        </div><!-- /admin-form-col -->
+
+        <aside class="admin-sidebar">
+          <div class="admin-tip-card">
+            <p class="admin-tip-card__title">Cómo modificar</p>
+            <ol class="admin-tip-list">
+              <li>Buscá el producto por nombre.</li>
+              <li>Hacé clic en <strong>"Modificar"</strong>.</li>
+              <li>Editá los datos y hacé clic en <strong>"Guardar cambios"</strong>.</li>
+              <li>Para el stock, usá el campo de cada variante y clic en <strong>"Actualizar"</strong>.</li>
+            </ol>
+          </div>
+        </aside>
+
+      </div><!-- /admin-layout -->
+    </div><!-- /edit-panel -->
+
+  </section>
+
+</main>
+
+<!-- ════ MODAL: Nueva categoría ════ -->
+<div class="modal-overlay" id="modal-categoria" role="dialog" aria-modal="true" aria-labelledby="modal-cat-title">
+  <div class="modal">
+    <div class="modal-header">
+      <p class="modal-title" id="modal-cat-title">Nueva categoría</p>
+      <button class="modal-close" id="modal-cat-close" aria-label="Cerrar">
+        <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div id="modal-cat-msg" class="admin-msg" role="alert"></div>
+      <div class="form-group">
+        <label class="form-label" for="nueva-cat-nombre">Nombre de la categoría</label>
+        <input class="form-input" type="text" id="nueva-cat-nombre" placeholder="Ej: Accesorios" />
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" id="modal-cat-cancel">Cancelar</button>
+      <button class="btn btn-primary" id="modal-cat-save">Crear categoría</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════ FOOTER ════ -->
+<footer class="global-footer" role="contentinfo">
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <span class="brand-name-sm">Lana &amp; Lino</span>
+      <p>Moda con estilo, calidad y pasión.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Contacto</h4>
+      <ul>
+        <li>
+          <a href="mailto:felipeprono@gmail.com">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+              <polyline points="22,6 12,13 2,6"/>
+            </svg>
+            felipeprono@gmail.com
+          </a>
+        </li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Redes</h4>
+      <ul>
+        <li><a href="#">@lanaylino</a></li>
+        <li><a href="#">Lana &amp; Lino</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>&copy; 2025 Lana &amp; Lino.</p>
+    <p>Desarrollado por <strong>Felipe Prono</strong> y <strong>Emilio Serovich</strong></p>
+  </div>
+</footer>
+
+<script src="js/auth.js"></script>
+<script src="js/api.js"></script>
+<script src="js/app.js"></script>
+<script src="js/admin.js"></script>
+</body>
+</html>

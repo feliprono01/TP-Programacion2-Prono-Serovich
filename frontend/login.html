@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Iniciá sesión o registrate en Lana &amp; Lino para acceder a tu carrito, favoritos y más." />
+  <title>Lana &amp; Lino — Iniciar sesión</title>
+
+  <link rel="stylesheet" href="css/tokens.css" />
+  <link rel="stylesheet" href="css/global.css" />
+  <link rel="stylesheet" href="css/components.css" />
+  <link rel="stylesheet" href="css/auth.css" />
+</head>
+<body>
+
+<div class="auth-page">
+
+  <!-- ════ PANEL IZQUIERDO: Marca ════ -->
+  <div class="auth-brand-panel">
+    <!-- Decoración geométrica -->
+    <div class="auth-deco auth-deco-1" aria-hidden="true"></div>
+    <div class="auth-deco auth-deco-2" aria-hidden="true"></div>
+
+    <div class="auth-brand-panel__top">
+      <a href="index.html" class="auth-brand-logo">Lana &amp; Lino</a>
+    </div>
+
+    <div class="auth-brand-panel__center">
+      <h1 class="auth-brand-tagline">Tu estilo,<br/>tu identidad.</h1>
+      <p class="auth-brand-sub">
+        Accedé a tu cuenta para guardar favoritos, administrar tu carrito y comprar con facilidad.
+      </p>
+    </div>
+
+    <div class="auth-brand-panel__bottom">
+      <p>&copy; 2025 Lana &amp; Lino</p>
+    </div>
+  </div>
+
+  <!-- ════ PANEL DERECHO: Formulario ════ -->
+  <div class="auth-form-panel">
+
+    <!-- Toggle tema -->
+    <button class="icon-btn auth-theme-btn" id="theme-toggle" aria-label="Cambiar tema" title="Cambiar tema">
+      <!-- ícono inyectado por JS -->
+    </button>
+
+    <div class="auth-form-wrap">
+
+      <!-- Tabs -->
+      <div class="auth-tabs" role="tablist" aria-label="Seleccionar acción">
+        <button
+          class="auth-tab active"
+          id="tab-login"
+          role="tab"
+          aria-selected="true"
+          aria-controls="panel-login"
+        >Iniciar sesión</button>
+        <button
+          class="auth-tab"
+          id="tab-register"
+          role="tab"
+          aria-selected="false"
+          aria-controls="panel-register"
+        >Crear cuenta</button>
+      </div>
+
+      <!-- ── FORMULARIO LOGIN ── -->
+      <div id="panel-login" role="tabpanel" aria-labelledby="tab-login">
+        <div class="auth-form-header">
+          <h2 class="auth-form-title">Bienvenido/a</h2>
+          <p class="auth-form-subtitle">Ingresá con tu email y contraseña.</p>
+        </div>
+
+        <div id="login-error" class="auth-error" role="alert"></div>
+
+        <form class="auth-form" id="login-form" novalidate>
+          <div class="form-group">
+            <label class="form-label" for="login-email">Email</label>
+            <input
+              class="form-input"
+              type="email"
+              id="login-email"
+              name="email"
+              placeholder="tu@email.com"
+              autocomplete="email"
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="login-password">Contraseña</label>
+            <input
+              class="form-input"
+              type="password"
+              id="login-password"
+              name="password"
+              placeholder="••••••••"
+              autocomplete="current-password"
+              required
+            />
+          </div>
+
+          <button
+            class="btn btn-primary btn-block"
+            type="submit"
+            id="login-submit"
+          >
+            Iniciar sesión
+          </button>
+        </form>
+
+        <p style="text-align:center; margin-top: var(--spacing-lg); font-size: var(--fs-button); color: var(--color-mute);">
+          ¿No tenés cuenta?
+          <button class="auth-tab-switch" data-target="register"
+            style="background:none;border:none;color:var(--color-ink);font-weight:600;cursor:pointer;font-size:inherit;">
+            Registrate
+          </button>
+        </p>
+      </div>
+
+      <!-- ── FORMULARIO REGISTRO ── -->
+      <div id="panel-register" role="tabpanel" aria-labelledby="tab-register" class="hidden">
+        <div class="auth-form-header">
+          <h2 class="auth-form-title">Crear cuenta</h2>
+          <p class="auth-form-subtitle">Completá tus datos para registrarte.</p>
+        </div>
+
+        <div id="register-error" class="auth-error" role="alert"></div>
+
+        <form class="auth-form" id="register-form" novalidate>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="reg-nombre">Nombre</label>
+              <input
+                class="form-input"
+                type="text"
+                id="reg-nombre"
+                name="nombre"
+                placeholder="Juan"
+                autocomplete="given-name"
+                required
+              />
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="reg-apellido">Apellido</label>
+              <input
+                class="form-input"
+                type="text"
+                id="reg-apellido"
+                name="apellido"
+                placeholder="García"
+                autocomplete="family-name"
+                required
+              />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="reg-email">Email</label>
+            <input
+              class="form-input"
+              type="email"
+              id="reg-email"
+              name="email"
+              placeholder="tu@email.com"
+              autocomplete="email"
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="reg-telefono">Teléfono</label>
+            <input
+              class="form-input"
+              type="tel"
+              id="reg-telefono"
+              name="telefono"
+              placeholder="+54 11 1234-5678"
+              autocomplete="tel"
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="reg-direccion">Dirección</label>
+            <input
+              class="form-input"
+              type="text"
+              id="reg-direccion"
+              name="direccion"
+              placeholder="Av. Corrientes 1234, CABA"
+              autocomplete="street-address"
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="reg-password">Contraseña</label>
+            <input
+              class="form-input"
+              type="password"
+              id="reg-password"
+              name="password"
+              placeholder="Máximo 20 caracteres"
+              autocomplete="new-password"
+              required
+              minlength="6"
+              maxlength="20"
+            />
+            <span style="font-size:12px;color:var(--color-mute);">Entre 6 y 20 caracteres.</span>
+          </div>
+
+          <button
+            class="btn btn-primary btn-block"
+            type="submit"
+            id="register-submit"
+          >
+            Crear cuenta
+          </button>
+        </form>
+
+        <p style="text-align:center; margin-top: var(--spacing-lg); font-size: var(--fs-button); color: var(--color-mute);">
+          ¿Ya tenés cuenta?
+          <button class="auth-tab-switch" data-target="login"
+            style="background:none;border:none;color:var(--color-ink);font-weight:600;cursor:pointer;font-size:inherit;">
+            Iniciá sesión
+          </button>
+        </p>
+      </div>
+
+    </div><!-- /auth-form-wrap -->
+  </div><!-- /auth-form-panel -->
+
+</div><!-- /auth-page -->
+
+<script src="js/auth.js"></script>
+<script src="js/api.js"></script>
+<script src="js/app.js"></script>
+<script src="js/login.js"></script>
+</body>
+</html>

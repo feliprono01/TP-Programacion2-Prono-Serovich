@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Tu perfil en Lana & Lino. Editá tus datos personales y gestioná tus productos favoritos." />
+  <title>Lana &amp; Lino — Mi Perfil</title>
+
+  <link rel="stylesheet" href="css/tokens.css" />
+  <link rel="stylesheet" href="css/global.css" />
+  <link rel="stylesheet" href="css/components.css" />
+  <link rel="stylesheet" href="css/profile.css" />
+</head>
+<body>
+
+<!-- ════ HEADER (inyectado por app.js) ════ -->
+<div id="header-mount"></div>
+
+<!-- ════ MAIN ════ -->
+<main class="page-content profile-page" id="profile-page">
+
+  <!-- ── HERO ── -->
+  <section class="profile-hero">
+    <div class="profile-hero__inner container">
+      <div class="profile-avatar" id="profile-avatar" aria-hidden="true"></div>
+      <div class="profile-hero__info">
+        <h1 class="profile-hero__name" id="profile-hero-name">Cargando…</h1>
+        <p class="profile-hero__email" id="profile-hero-email"></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── TABS ── -->
+  <div class="profile-tabs-wrap">
+    <div class="container">
+      <nav class="profile-tabs" role="tablist" aria-label="Secciones del perfil">
+        <button class="profile-tab active" id="tab-datos" role="tab"
+          aria-selected="true" aria-controls="section-datos" data-tab="datos">
+          Mis datos
+        </button>
+        <button class="profile-tab" id="tab-favoritos" role="tab"
+          aria-selected="false" aria-controls="section-favoritos" data-tab="favoritos">
+          Favoritos
+        </button>
+      </nav>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════
+       SECCIÓN: MIS DATOS
+       ══════════════════════════════ -->
+  <section id="section-datos" class="profile-section container"
+    role="tabpanel" aria-labelledby="tab-datos">
+
+    <!-- Loader inicial -->
+    <div class="loader" id="datos-loader">
+      <div class="spinner"></div>
+    </div>
+
+    <!-- Layout de dos columnas -->
+    <div class="profile-layout hidden" id="profile-layout">
+
+      <!-- Columna principal: Formulario -->
+      <div class="profile-form" id="profile-form-wrap">
+
+        <!-- ── Card: Información personal ── -->
+        <div class="profile-card">
+          <div class="profile-card__header">
+            <div class="profile-card__icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            </div>
+            <div>
+              <p class="profile-card__title">Información personal</p>
+              <p class="profile-card__subtitle">Nombre, email y datos de contacto</p>
+            </div>
+          </div>
+
+          <form class="profile-card__body" id="profile-form" novalidate>
+            <!-- Alerta de éxito/error -->
+            <div id="profile-msg" class="profile-msg" role="alert"></div>
+
+            <!-- Nombre + Apellido -->
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label" for="pf-nombre">Nombre</label>
+                <div class="form-group--icon">
+                  <input class="form-input" type="text" id="pf-nombre" name="nombre"
+                    placeholder="Juan" autocomplete="given-name" required />
+                  <svg class="fg-icon" viewBox="0 0 24 24">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                    <circle cx="12" cy="7" r="4"/>
+                  </svg>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="pf-apellido">Apellido</label>
+                <div class="form-group--icon">
+                  <input class="form-input" type="text" id="pf-apellido" name="apellido"
+                    placeholder="García" autocomplete="family-name" required />
+                  <svg class="fg-icon" viewBox="0 0 24 24">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                    <circle cx="12" cy="7" r="4"/>
+                  </svg>
+                </div>
+              </div>
+            </div>
+
+            <!-- Email -->
+            <div class="form-group">
+              <label class="form-label" for="pf-email">Email</label>
+              <div class="form-group--icon">
+                <input class="form-input" type="email" id="pf-email" name="email"
+                  placeholder="tu@email.com" autocomplete="email" required />
+                <svg class="fg-icon" viewBox="0 0 24 24">
+                  <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                  <polyline points="22,6 12,13 2,6"/>
+                </svg>
+              </div>
+            </div>
+
+            <!-- Teléfono -->
+            <div class="form-group">
+              <label class="form-label" for="pf-telefono">Teléfono</label>
+              <div class="form-group--icon">
+                <input class="form-input" type="tel" id="pf-telefono" name="telefono"
+                  placeholder="+54 11 1234-5678" autocomplete="tel" required />
+                <svg class="fg-icon" viewBox="0 0 24 24">
+                  <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.71 3.41 2 2 0 0 1 3.67 1.25h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.9a16 16 0 0 0 6.29 6.29l1.2-1.2a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/>
+                </svg>
+              </div>
+            </div>
+
+            <!-- Dirección -->
+            <div class="form-group">
+              <label class="form-label" for="pf-direccion">Dirección</label>
+              <div class="form-group--icon">
+                <input class="form-input" type="text" id="pf-direccion" name="direccion"
+                  placeholder="Av. Corrientes 1234, CABA" autocomplete="street-address" required />
+                <svg class="fg-icon" viewBox="0 0 24 24">
+                  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                  <circle cx="12" cy="10" r="3"/>
+                </svg>
+              </div>
+            </div>
+
+            <!-- Divisor -->
+            <div class="profile-form__divider">
+              <span>Cambiar contraseña <em>(opcional)</em></span>
+            </div>
+
+            <!-- Contraseña -->
+            <div class="form-group">
+              <label class="form-label" for="pf-password">Nueva contraseña</label>
+              <div class="form-group--icon">
+                <input class="form-input" type="password" id="pf-password" name="password"
+                  placeholder="Dejá en blanco para no cambiarla"
+                  autocomplete="new-password" minlength="6" maxlength="20" />
+                <svg class="fg-icon" viewBox="0 0 24 24">
+                  <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                  <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                </svg>
+              </div>
+              <span style="font-size:11px;color:var(--color-mute);padding-left:42px;">Entre 6 y 20 caracteres si la cambiás.</span>
+            </div>
+
+            <!-- Acciones -->
+            <div class="profile-form__actions">
+              <button class="btn btn-primary" type="submit" id="pf-save-btn">
+                Guardar cambios
+              </button>
+              <button class="btn btn-ghost" type="button" id="pf-cancel-btn">
+                Descartar
+              </button>
+            </div>
+          </form>
+        </div><!-- /profile-card -->
+
+      </div><!-- /profile-form -->
+
+      <!-- Columna lateral: Info de resumen -->
+      <aside class="profile-sidebar" id="profile-sidebar" aria-label="Resumen de cuenta">
+
+        <!-- Card: Resumen -->
+        <div class="profile-info-card" id="profile-summary-card">
+          <p class="profile-info-card__title">Resumen de cuenta</p>
+
+          <div class="profile-info-row" id="sidebar-nombre-row">
+            <span class="profile-info-label">Nombre completo</span>
+            <span class="profile-info-value" id="sidebar-nombre">—</span>
+          </div>
+
+          <div class="profile-info-divider"></div>
+
+          <div class="profile-info-row" id="sidebar-email-row">
+            <span class="profile-info-label">Email</span>
+            <span class="profile-info-value" id="sidebar-email">—</span>
+          </div>
+
+          <div class="profile-info-divider"></div>
+
+          <div class="profile-info-row" id="sidebar-telefono-row">
+            <span class="profile-info-label">Teléfono</span>
+            <span class="profile-info-value" id="sidebar-telefono">—</span>
+          </div>
+
+          <div class="profile-info-divider"></div>
+
+          <div class="profile-info-row" id="sidebar-direccion-row">
+            <span class="profile-info-label">Dirección</span>
+            <span class="profile-info-value" id="sidebar-direccion">—</span>
+          </div>
+        </div>
+
+        <!-- Card: Tip de seguridad -->
+        <div class="profile-tip">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          </svg>
+          <span>Usá una contraseña única y segura para proteger tu cuenta.</span>
+        </div>
+
+      </aside>
+
+    </div><!-- /profile-layout -->
+
+  </section>
+
+  <!-- ══════════════════════════════
+       SECCIÓN: FAVORITOS
+       ══════════════════════════════ -->
+  <section id="section-favoritos" class="profile-section container hidden"
+    role="tabpanel" aria-labelledby="tab-favoritos">
+
+    <div class="loader" id="favs-loader">
+      <div class="spinner"></div>
+    </div>
+
+    <div id="favs-grid" class="favs-grid hidden"></div>
+
+    <div id="favs-empty" class="empty-state hidden">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+      </svg>
+      <p class="empty-state__title">Sin favoritos aún</p>
+      <p class="empty-state__subtitle">Explorá el catálogo y agregá productos que te gusten.</p>
+      <a href="index.html" class="btn btn-primary">Ver catálogo</a>
+    </div>
+
+  </section>
+
+</main>
+
+<!-- ════ FOOTER ════ -->
+<footer class="global-footer" role="contentinfo">
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <span class="brand-name-sm">Lana &amp; Lino</span>
+      <p>Moda con estilo, calidad y pasión.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Contacto</h4>
+      <ul>
+        <li>
+          <a href="mailto:felipeprono@gmail.com">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+              <polyline points="22,6 12,13 2,6"/>
+            </svg>
+            felipeprono@gmail.com
+          </a>
+        </li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Redes</h4>
+      <ul>
+        <li><a href="#">@lanaylino</a></li>
+        <li><a href="#">Lana &amp; Lino</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>&copy; 2025 Lana &amp; Lino.</p>
+    <p>Desarrollado por <strong>Felipe Prono</strong> y <strong>Emilio Serovich</strong></p>
+  </div>
+</footer>
+
+<script src="js/auth.js"></script>
+<script src="js/api.js"></script>
+<script src="js/app.js"></script>
+<script src="js/profile.js"></script>
+</body>
+</html>
