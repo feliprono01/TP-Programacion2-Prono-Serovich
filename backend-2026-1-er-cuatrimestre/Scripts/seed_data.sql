@@ -13,14 +13,26 @@
 
 USE lanaylino;
 
+-- Configurar la codificación para evitar problemas con las tildes y ñ
+SET NAMES utf8mb4;
+
 -- ──────────────────────────────────────────────────────────
 --  LIMPIAR DATOS PREVIOS (orden para respetar FK)
 -- ──────────────────────────────────────────────────────────
 SET FOREIGN_KEY_CHECKS = 0;
-TRUNCATE TABLE inventario;
-TRUNCATE TABLE producto;
-TRUNCATE TABLE categoria;
-TRUNCATE TABLE usuario;
+DELETE FROM detalle_pedido;
+DELETE FROM pedido;
+DELETE FROM inventario;
+DELETE FROM producto;
+DELETE FROM categoria;
+DELETE FROM usuario;
+
+ALTER TABLE detalle_pedido AUTO_INCREMENT = 1;
+ALTER TABLE pedido AUTO_INCREMENT = 1;
+ALTER TABLE inventario AUTO_INCREMENT = 1;
+ALTER TABLE producto AUTO_INCREMENT = 1;
+ALTER TABLE categoria AUTO_INCREMENT = 1;
+ALTER TABLE usuario AUTO_INCREMENT = 1;
 SET FOREIGN_KEY_CHECKS = 1;
 
 -- ──────────────────────────────────────────────────────────
