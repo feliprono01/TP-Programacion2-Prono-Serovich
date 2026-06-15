@@ -111,6 +111,10 @@ async function loadUserData() {
     document.getElementById('profile-form').addEventListener('submit', handleSave);
     document.getElementById('pf-cancel-btn').addEventListener('click', handleDiscard);
 
+    // Limpiar errores inline de contraseña al escribir
+    document.getElementById('pf-password-current').addEventListener('input', () => clearFieldError('err-password-current'));
+    document.getElementById('pf-password').addEventListener('input', () => clearFieldError('err-password-new'));
+
   } catch (err) {
     loader.classList.add('hidden');
     layout.classList.remove('hidden');
@@ -159,7 +163,8 @@ async function handleSave(e) {
   const email     = document.getElementById('pf-email').value.trim();
   const telefono  = document.getElementById('pf-telefono').value.trim();
   const direccion = document.getElementById('pf-direccion').value.trim();
-  const password  = document.getElementById('pf-password').value;
+  const passwordActual = document.getElementById('pf-password-current').value;
+  const password       = document.getElementById('pf-password').value;
 
   if (!nombre || !apellido || !email || !telefono || !direccion) {
     showProfileMsg('error', 'Completá todos los campos obligatorios.');
@@ -169,8 +174,24 @@ async function handleSave(e) {
     showProfileMsg('error', 'Ingresá un email válido.');
     return;
   }
+
+  // Si se quiere cambiar la contraseña, ambos campos son obligatorios
+  clearFieldError('err-password-current');
+  clearFieldError('err-password-new');
+
+  if (password && !passwordActual) {
+    showFieldError('err-password-current', 'Ingresá tu contraseña actual para poder cambiarla.');
+    document.getElementById('pf-password-current').focus();
+    return;
+  }
+  if (passwordActual && !password) {
+    showFieldError('err-password-new', 'Ingresá la nueva contraseña.');
+    document.getElementById('pf-password').focus();
+    return;
+  }
   if (password && (password.length < 6 || password.length > 20)) {
-    showProfileMsg('error', 'La contraseña debe tener entre 6 y 20 caracteres.');
+    showFieldError('err-password-new', 'La contraseña debe tener entre 6 y 20 caracteres.');
+    document.getElementById('pf-password').focus();
     return;
   }
 
@@ -178,6 +199,24 @@ async function handleSave(e) {
   setLoadingBtn(saveBtn, true, 'Guardando…');
 
   try {
+    // Si quiere cambiar la contraseña, verificar la actual via login
+    if (password && passwordActual) {
+      const emailActual = originalData.email || email;
+      let loginOk = false;
+      try {
+        const loginRes = await window.Api.login(emailActual, passwordActual);
+        loginOk = loginRes.codigo === 200 && loginRes.payload && loginRes.payload.length > 0;
+      } catch (_) {
+        loginOk = false;
+      }
+      if (!loginOk) {
+        showFieldError('err-password-current', 'La contraseña actual es incorrecta.');
+        document.getElementById('pf-password-current').focus();
+        setLoadingBtn(saveBtn, false, 'Guardar cambios');
+        return;
+      }
+    }
+
     const payload = { nombre, apellido, email, telefono, direccion };
     if (password) payload.password = password;
 
@@ -193,6 +232,7 @@ async function handleSave(e) {
     updateHero(originalData);
     updateSidebar(originalData);
 
+    document.getElementById('pf-password-current').value = '';
     document.getElementById('pf-password').value = '';
     showProfileMsg('success', '¡Cambios guardados correctamente!');
     window.App.showToast('Perfil actualizado', 'success');
@@ -218,6 +258,7 @@ function handleDiscard() {
   document.getElementById('pf-email').value     = originalData.email     || '';
   document.getElementById('pf-telefono').value  = originalData.telefono  || '';
   document.getElementById('pf-direccion').value = originalData.direccion || '';
+  document.getElementById('pf-password-current').value = '';
   document.getElementById('pf-password').value  = '';
   clearProfileMsg();
   window.App.showToast('Cambios descartados', 'info');
@@ -386,6 +427,22 @@ function clearProfileMsg() {
   if (!el) return;
   el.textContent = '';
   el.className = 'profile-msg';
+}
+
+/* ── Errores inline por campo ── */
+function showFieldError(elementId, message) {
+  const el = document.getElementById(elementId);
+  if (!el) return;
+  el.textContent = message;
+  el.classList.remove('hidden');
+  el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function clearFieldError(elementId) {
+  const el = document.getElementById(elementId);
+  if (!el) return;
+  el.textContent = '';
+  el.classList.add('hidden');
 }
 
 function setLoadingBtn(btn, loading, text) {

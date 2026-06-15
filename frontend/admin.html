@@ -220,26 +220,55 @@
             <form id="inventario-form" class="inventario-row-form" novalidate>
               <div class="inventario-inputs">
                 <div class="form-group">
-                  <label class="form-label" for="inv-talle">Talle</label>
-                  <input class="form-input" type="text" id="inv-talle" placeholder="XS, S, M, L, XL…" required />
+                  <label class="form-label">Talles</label>
+                  <div class="multiselect-dropdown" id="inv-talles-dropdown">
+                    <button class="form-select multiselect-trigger" type="button" id="inv-talles-trigger">Seleccionar talles…</button>
+                    <div class="multiselect-options hidden" id="inv-talles-options">
+                      <!-- Checkboxes se inyectarán por JS -->
+                    </div>
+                  </div>
                 </div>
                 <div class="form-group">
-                  <label class="form-label" for="inv-color">Color</label>
-                  <input class="form-input" type="text" id="inv-color" placeholder="Negro, Blanco…" required />
+                  <label class="form-label" for="inv-color-select">Color</label>
+                  <select class="form-select" id="inv-color-select" required>
+                    <option value="" disabled selected>Seleccioná…</option>
+                    <option value="Negro">Negro</option>
+                    <option value="Blanco">Blanco</option>
+                    <option value="Gris">Gris</option>
+                    <option value="Rojo">Rojo</option>
+                    <option value="Azul">Azul</option>
+                    <option value="Verde">Verde</option>
+                    <option value="Amarillo">Amarillo</option>
+                    <option value="Naranja">Naranja</option>
+                    <option value="Rosa">Rosa</option>
+                    <option value="Marrón">Marrón</option>
+                    <option value="Beige">Beige</option>
+                    <option value="Celeste">Celeste</option>
+                    <option value="Bordó">Bordó</option>
+                    <option value="Violeta">Violeta</option>
+                    <option value="custom">+ Agregar nuevo color...</option>
+                  </select>
+                  <input class="form-input hidden" type="text" id="inv-color-custom" placeholder="Escribí el nuevo color…" style="margin-top:8px;" />
                 </div>
-                <div class="form-group">
+                <div class="form-group" style="position:relative">
                   <label class="form-label" for="inv-stock">Stock</label>
-                  <input class="form-input" type="number" id="inv-stock" placeholder="0" min="0" step="1" value="10" required />
+                  <div style="display:flex;gap:6px;align-items:center;">
+                    <input class="form-input" type="number" id="inv-stock" placeholder="0" min="0" step="1" value="10" required style="flex:1;" />
+                    <button class="btn btn-secondary" type="submit" id="inv-add-btn" title="Confirmar variante" aria-label="Confirmar y agregar variante" style="height:40px;width:40px;padding:0;flex-shrink:0;display:flex;align-items:center;justify-content:center;">
+                      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                    </button>
+                  </div>
                 </div>
               </div>
-              <button class="btn btn-secondary" type="submit" id="inv-add-btn">
-                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              <button class="btn btn-ghost btn-sm" type="submit" id="inv-add-btn-text" style="align-self:flex-start;margin-top:4px;font-size:13px;">
+                <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
                 Agregar variante
               </button>
             </form>
-            <div class="inventario-actions">
+            <div class="inventario-actions" style="flex-wrap:wrap;gap:8px;">
               <button class="btn btn-primary" type="button" id="finalizar-btn">✓ Finalizar y cargar otro</button>
               <a href="index.html" class="btn btn-ghost">Ver catálogo</a>
+              <span id="finalizar-msg" class="admin-msg" role="alert" style="display:none;margin:0;padding:6px 12px;"></span>
             </div>
           </div>
         </div>
@@ -401,12 +430,35 @@
                 <form id="edit-inventario-form" class="inventario-row-form" novalidate>
                   <div class="inventario-inputs">
                     <div class="form-group">
-                      <label class="form-label" for="einv-talle">Talle</label>
-                      <input class="form-input" type="text" id="einv-talle" placeholder="XS, S, M…" required />
+                      <label class="form-label">Talles</label>
+                      <div class="multiselect-dropdown" id="einv-talles-dropdown">
+                        <button class="form-select multiselect-trigger" type="button" id="einv-talles-trigger">Seleccionar talles…</button>
+                        <div class="multiselect-options hidden" id="einv-talles-options">
+                          <!-- Checkboxes se inyectarán por JS -->
+                        </div>
+                      </div>
                     </div>
                     <div class="form-group">
-                      <label class="form-label" for="einv-color">Color</label>
-                      <input class="form-input" type="text" id="einv-color" placeholder="Negro…" required />
+                      <label class="form-label" for="einv-color-select">Color</label>
+                      <select class="form-select" id="einv-color-select" required>
+                        <option value="" disabled selected>Seleccioná…</option>
+                        <option value="Negro">Negro</option>
+                        <option value="Blanco">Blanco</option>
+                        <option value="Gris">Gris</option>
+                        <option value="Rojo">Rojo</option>
+                        <option value="Azul">Azul</option>
+                        <option value="Verde">Verde</option>
+                        <option value="Amarillo">Amarillo</option>
+                        <option value="Naranja">Naranja</option>
+                        <option value="Rosa">Rosa</option>
+                        <option value="Marrón">Marrón</option>
+                        <option value="Beige">Beige</option>
+                        <option value="Celeste">Celeste</option>
+                        <option value="Bordó">Bordó</option>
+                        <option value="Violeta">Violeta</option>
+                        <option value="custom">+ Agregar nuevo color...</option>
+                      </select>
+                      <input class="form-input hidden" type="text" id="einv-color-custom" placeholder="Escribí el nuevo color…" style="margin-top:8px;" />
                     </div>
                     <div class="form-group">
                       <label class="form-label" for="einv-stock">Stock</label>

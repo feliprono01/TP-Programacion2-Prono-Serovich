@@ -1,6 +1,6 @@
 /* ============================================================
-   LANA & LINO — Catalog.js (Etapa 1: estructura base)
-   La lógica completa de carga/filtros se completa en Etapa 2.
+   LANA & LINO — catalog.js
+   Catálogo con filter drawer lateral
    ============================================================ */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -13,56 +13,49 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // Botón "Ver todos" en empty state
-  const clearBtn = document.getElementById('clear-search-btn');
-  if (clearBtn) {
-    clearBtn.addEventListener('click', () => {
-      window.handleSearch('');
-    });
+  const clearSearchBtn = document.getElementById('clear-search-btn');
+  if (clearSearchBtn) {
+    clearSearchBtn.addEventListener('click', () => window.handleSearch(''));
   }
 
   // Leer parámetros de URL (si vienen de otra página)
-  const params = new URLSearchParams(window.location.search);
+  const params   = new URLSearchParams(window.location.search);
   const qParam   = params.get('q');
   const catParam = params.get('cat');
 
-  // Rellenar buscador con el término si viene en URL
   if (qParam) {
     const input = document.getElementById('search-input');
     if (input) input.value = qParam;
   }
 
-  // Iniciar carga de productos
   loadProducts(qParam, catParam);
+  initFilterDrawer();
 });
 
 /* ─────────────────────────────────────
-   Estado de filtros activo
+   Estado de filtros
 ───────────────────────────────────── */
-let allProducts = [];
-let activeFilters = { genero: 'all', color: 'all', categoria: 'all', q: '' };
+let allProducts   = [];
+let activeFilters = { generos: [], colores: [], categoria: 'all', q: '' };
 
 /* ─────────────────────────────────────
-   Carga y renderizado
+   Carga de productos
 ───────────────────────────────────── */
 async function loadProducts(initialQ = null, initialCat = null) {
-  const grid    = document.getElementById('product-grid');
-  const loader  = document.getElementById('catalog-loader');
-  const empty   = document.getElementById('empty-state');
+  const grid   = document.getElementById('product-grid');
+  const loader = document.getElementById('catalog-loader');
+  const empty  = document.getElementById('empty-state');
 
   try {
-    const res = await window.Api.obtenerProductos();
+    const res  = await window.Api.obtenerProductos();
     allProducts = res.payload || [];
 
-    // Inicializar filtros de color con los colores únicos del catálogo
-    buildColorFilters(allProducts);
-    bindFilterEvents();
+    buildColorFilterOptions(allProducts);
 
-    // Aplicar filtros iniciales si vienen por URL
     if (initialQ)   activeFilters.q         = initialQ;
     if (initialCat) activeFilters.categoria  = initialCat;
 
     renderGrid();
-
   } catch (err) {
     console.error('Error al cargar productos:', err);
     if (loader) loader.remove();
@@ -78,23 +71,25 @@ async function loadProducts(initialQ = null, initialCat = null) {
   }
 }
 
+/* ─────────────────────────────────────
+   Renderizado del grid
+───────────────────────────────────── */
 function renderGrid() {
-  const grid   = document.getElementById('product-grid');
-  const empty  = document.getElementById('empty-state');
-  const count  = document.getElementById('catalog-count');
+  const grid    = document.getElementById('product-grid');
+  const empty   = document.getElementById('empty-state');
+  const count   = document.getElementById('catalog-count');
   const heading = document.getElementById('catalog-heading');
   if (!grid) return;
 
-  // Filtrar
   let filtered = allProducts.filter(p => {
-    const matchQ    = !activeFilters.q || p.producto.toLowerCase().includes(activeFilters.q.toLowerCase());
-    const matchGen  = activeFilters.genero === 'all' || p.genero === activeFilters.genero;
-    const matchCat  = activeFilters.categoria === 'all' || String(p.idCategoria) === String(activeFilters.categoria);
-    const matchColor= activeFilters.color === 'all' || (p.color && p.color.toLowerCase() === activeFilters.color.toLowerCase());
+    const matchQ     = !activeFilters.q || p.producto.toLowerCase().includes(activeFilters.q.toLowerCase());
+    const matchGen   = activeFilters.generos.length === 0 || activeFilters.generos.includes(p.genero);
+    const matchCat   = activeFilters.categoria === 'all' || String(p.idCategoria) === String(activeFilters.categoria);
+    const matchColor = activeFilters.colores.length === 0 || (p.color && activeFilters.colores.includes(p.color));
     return matchQ && matchGen && matchCat && matchColor;
   });
 
-  // Actualizar heading y contador
+  // Heading dinámico
   if (activeFilters.q) {
     if (heading) heading.textContent = `Resultados para "${activeFilters.q}"`;
   } else if (activeFilters.categoria !== 'all') {
@@ -105,7 +100,7 @@ function renderGrid() {
   }
   if (count) count.textContent = `${filtered.length} producto${filtered.length !== 1 ? 's' : ''}`;
 
-  // Vacío
+  // Estado vacío
   if (filtered.length === 0) {
     grid.innerHTML = '';
     if (empty) {
@@ -113,28 +108,24 @@ function renderGrid() {
       const msg = document.getElementById('empty-state-msg');
       if (msg) msg.textContent = activeFilters.q
         ? `No encontramos productos para "${activeFilters.q}".`
-        : 'No hay productos en esta categoría con los filtros seleccionados.';
+        : 'No hay productos con los filtros seleccionados.';
     }
     return;
   }
 
   if (empty) empty.classList.add('hidden');
-
-  // Renderizar tarjetas
   grid.innerHTML = filtered.map(p => renderProductCard(p)).join('');
 
   // Eventos en tarjetas
   grid.querySelectorAll('.product-card[data-id]').forEach(card => {
-    card.addEventListener('click', (e) => {
-      // No navegar si hicieron clic en el botón de favorito
+    card.addEventListener('click', e => {
       if (e.target.closest('.product-card__fav-btn')) return;
       window.location.href = `producto.html?id=${card.dataset.id}`;
     });
   });
 
-  // Eventos del botón de favorito en tarjeta
   grid.querySelectorAll('.product-card__fav-btn').forEach(btn => {
-    btn.addEventListener('click', async (e) => {
+    btn.addEventListener('click', async e => {
       e.stopPropagation();
       if (!window.Auth.isLoggedIn()) {
         window.App.showToast('Iniciá sesión para guardar favoritos', 'info');
@@ -143,7 +134,6 @@ function renderGrid() {
       const idProducto = btn.dataset.productId;
       const idUsuario  = window.Auth.getUserId();
       const isActive   = btn.classList.contains('active');
-
       try {
         if (isActive) {
           await window.Api.eliminarFavorito(idUsuario, idProducto);
@@ -156,7 +146,7 @@ function renderGrid() {
           btn.innerHTML = window.App.SVG.heart(true);
           window.App.showToast('Agregado a favoritos', 'success');
         }
-      } catch (err) {
+      } catch {
         window.App.showToast('Error al actualizar favoritos', 'error');
       }
     });
@@ -164,7 +154,7 @@ function renderGrid() {
 }
 
 function renderProductCard(p) {
-  const precio = window.App.formatPrice(p.precio);
+  const precio   = window.App.formatPrice(p.precio);
   const sinStock = p.stock === 0;
   const isLogged = window.Auth.isLoggedIn();
 
@@ -194,37 +184,138 @@ function renderProductCard(p) {
 }
 
 /* ─────────────────────────────────────
-   Filtros
+   FILTER DRAWER
 ───────────────────────────────────── */
-function buildColorFilters(productos) {
-  const colorContainer = document.getElementById('color-filters');
-  if (!colorContainer) return;
+function buildColorFilterOptions(productos) {
+  const container = document.getElementById('filter-body-color');
+  if (!container) return;
 
   const colores = [...new Set(
     productos.flatMap(p => p.color ? [p.color] : []).filter(Boolean)
   )].sort();
 
-  colorContainer.innerHTML = colores.map(c =>
-    `<button class="filter-chip" data-filter="color" data-value="${c}">${c}</button>`
-  ).join('');
+  container.innerHTML = colores.map(c => `
+    <label class="filter-checkbox-item">
+      <input type="checkbox" name="color" value="${c}" id="fcheck-color-${c.replace(/\s/g,'-')}">
+      ${c}
+    </label>
+  `).join('');
 }
 
-function bindFilterEvents() {
-  document.querySelectorAll('.filter-chip').forEach(chip => {
-    chip.addEventListener('click', () => {
-      const filterType = chip.dataset.filter;
-      const value      = chip.dataset.value;
+function initFilterDrawer() {
+  const toggleBtn  = document.getElementById('filter-toggle-btn');
+  const drawer     = document.getElementById('filter-drawer');
+  const backdrop   = document.getElementById('filter-backdrop');
+  const closeBtn   = document.getElementById('filter-drawer-close');
+  const applyBtn   = document.getElementById('filter-apply-btn');
+  const clearBtn   = document.getElementById('filter-clear-btn');
+  const resultCount= document.getElementById('filter-result-count');
+  const activeDot  = document.getElementById('filter-active-dot');
 
-      // Actualizar estado activo visual
-      document.querySelectorAll(`.filter-chip[data-filter="${filterType}"]`)
-        .forEach(c => c.classList.remove('active'));
-      chip.classList.add('active');
+  if (!toggleBtn || !drawer || !backdrop) return;
 
-      // Aplicar filtro
-      activeFilters[filterType] = value;
-      renderGrid();
+  // Abrir
+  toggleBtn.addEventListener('click', () => openDrawer());
+
+  // Cerrar con X
+  if (closeBtn) closeBtn.addEventListener('click', () => closeDrawer());
+
+  // Cerrar con backdrop
+  backdrop.addEventListener('click', () => closeDrawer());
+
+  // Escape key
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && drawer.classList.contains('open')) closeDrawer();
+  });
+
+  // Aplicar filtros
+  if (applyBtn) applyBtn.addEventListener('click', () => {
+    applyDrawerFilters();
+    closeDrawer();
+  });
+
+  // Limpiar filtros
+  if (clearBtn) clearBtn.addEventListener('click', () => {
+    clearDrawerFilters();
+    updateResultCount();
+  });
+
+  // Secciones colapsables
+  document.querySelectorAll('.filter-section-toggle').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const section = btn.dataset.section;
+      const body    = document.getElementById(`filter-body-${section}`);
+      const expanded = btn.getAttribute('aria-expanded') === 'true';
+      btn.setAttribute('aria-expanded', String(!expanded));
+      body.classList.toggle('collapsed', expanded);
     });
   });
+
+  // Actualizar contador en tiempo real al cambiar checkboxes
+  drawer.addEventListener('change', () => updateResultCount());
+
+  function openDrawer() {
+    backdrop.classList.remove('hidden');
+    requestAnimationFrame(() => {
+      backdrop.classList.add('open');
+      drawer.classList.remove('hidden');
+      drawer.classList.add('open');
+    });
+    toggleBtn.setAttribute('aria-expanded', 'true');
+    updateResultCount();
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeDrawer() {
+    backdrop.classList.remove('open');
+    drawer.classList.remove('open');
+    toggleBtn.setAttribute('aria-expanded', 'false');
+    document.body.style.overflow = '';
+    setTimeout(() => {
+      backdrop.classList.add('hidden');
+    }, 250);
+  }
+
+  function applyDrawerFilters() {
+    const generoChecks = [...document.querySelectorAll('input[name="genero"]:checked')].map(i => i.value);
+    const colorChecks  = [...document.querySelectorAll('input[name="color"]:checked')].map(i => i.value);
+
+    activeFilters.generos = generoChecks;
+    activeFilters.colores = colorChecks;
+
+    renderGrid();
+    updateActiveDot();
+  }
+
+  function clearDrawerFilters() {
+    document.querySelectorAll('input[name="genero"], input[name="color"]').forEach(i => i.checked = false);
+    activeFilters.generos = [];
+    activeFilters.colores = [];
+    renderGrid();
+    updateActiveDot();
+  }
+
+  function updateResultCount() {
+    // Calcula cuántos productos coincidirían con los filtros seleccionados en el drawer
+    const generoChecks = [...document.querySelectorAll('input[name="genero"]:checked')].map(i => i.value);
+    const colorChecks  = [...document.querySelectorAll('input[name="color"]:checked')].map(i => i.value);
+
+    const count = allProducts.filter(p => {
+      const matchQ     = !activeFilters.q || p.producto.toLowerCase().includes(activeFilters.q.toLowerCase());
+      const matchGen   = generoChecks.length === 0 || generoChecks.includes(p.genero);
+      const matchCat   = activeFilters.categoria === 'all' || String(p.idCategoria) === String(activeFilters.categoria);
+      const matchColor = colorChecks.length === 0 || (p.color && colorChecks.includes(p.color));
+      return matchQ && matchGen && matchCat && matchColor;
+    }).length;
+
+    if (resultCount) resultCount.textContent = `${count} producto${count !== 1 ? 's' : ''}`;
+    if (applyBtn) applyBtn.textContent = `Mostrar ${count} producto${count !== 1 ? 's' : ''}`;
+  }
+
+  function updateActiveDot() {
+    const hasFilters = activeFilters.generos.length > 0 || activeFilters.colores.length > 0;
+    if (activeDot) activeDot.classList.toggle('hidden', !hasFilters);
+  }
 }
 
 /* ─────────────────────────────────────

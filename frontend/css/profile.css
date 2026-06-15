@@ -315,6 +315,22 @@
   color: var(--color-disabled);
 }
 
+/* Errores inline debajo de campos individuales */
+.field-error {
+  font-size: var(--fs-small);
+  color: var(--color-disabled);
+  background-color: rgba(211, 0, 5, .07);
+  border: 1px solid rgba(211, 0, 5, .20);
+  border-radius: var(--radius-sm);
+  padding: 6px var(--spacing-md);
+  margin-top: 4px;
+  font-weight: var(--fw-semibold);
+}
+
+.field-error.hidden {
+  display: none;
+}
+
 /* Divisor "Cambiar contraseña" */
 .profile-form__divider {
   display: flex;

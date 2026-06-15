@@ -1,9 +1,11 @@
 <!DOCTYPE html>
 <html lang="es" data-theme="light">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="Lana &amp; Lino — Tienda de indumentaria online. Remeras, buzos, camperas, bermudas, pantalones, calzado y más." />
+  <meta name="description"
+    content="Lana &amp; Lino — Tienda de indumentaria online. Remeras, buzos, camperas, bermudas, pantalones, calzado y más." />
   <title>Lana &amp; Lino — Catálogo</title>
 
   <!-- CSS -->
@@ -12,6 +14,7 @@
   <link rel="stylesheet" href="css/components.css" />
   <link rel="stylesheet" href="css/catalog.css" />
 </head>
+
 <body>
 
   <!-- Header (inyectado por app.js) -->
@@ -24,8 +27,8 @@
     <section class="hero" id="hero-section">
       <div class="hero-inner container">
         <p class="hero-eyebrow">Nueva colección 2025</p>
-        <h1 class="hero-title">Moda que<br/>te define.</h1>
-        <p class="hero-sub">Descubrí la colección completa de Lana &amp; Lino.<br/>Calidad y estilo en cada prenda.</p>
+        <h1 class="hero-title">Moda que<br />te define.</h1>
+        <p class="hero-sub">Descubrí la colección completa de Lana &amp; Lino.<br />Calidad y estilo en cada prenda.</p>
         <div class="hero-actions">
           <button class="btn btn-primary btn-lg" id="hero-cta">Ver colección</button>
         </div>
@@ -36,29 +39,97 @@
     <!-- Catálogo -->
     <section class="catalog-section container" id="catalog-section">
 
-      <!-- Barra de filtros -->
+      <!-- Barra de catálogo: título + botón de filtros -->
       <div class="catalog-header">
         <div class="catalog-title-area">
           <h2 class="section-title" id="catalog-heading">Todos los productos</h2>
           <span class="catalog-count" id="catalog-count"></span>
         </div>
 
-        <div class="filter-bar" id="filter-bar" role="group" aria-label="Filtros">
-          <!-- Género -->
-          <label>Género:</label>
-          <button class="filter-chip active" data-filter="genero" data-value="all">Todos</button>
-          <button class="filter-chip" data-filter="genero" data-value="M">Hombre</button>
-          <button class="filter-chip" data-filter="genero" data-value="F">Mujer</button>
-          <button class="filter-chip" data-filter="genero" data-value="U">Unisex</button>
-
-          <div style="width:1px;height:20px;background:var(--color-hairline);margin:0 4px;"></div>
-
-          <!-- Color (se llena dinámicamente) -->
-          <label>Color:</label>
-          <button class="filter-chip active" data-filter="color" data-value="all">Todos</button>
-          <div id="color-filters" style="display:contents;"></div>
-        </div>
+        <button class="filter-toggle-btn" id="filter-toggle-btn" aria-label="Abrir filtros"
+          aria-controls="filter-drawer" aria-expanded="false">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <line x1="4" y1="6" x2="20" y2="6" />
+            <line x1="8" y1="12" x2="16" y2="12" />
+            <line x1="11" y1="18" x2="13" y2="18" />
+          </svg>
+          Filtrar
+          <span class="filter-active-dot hidden" id="filter-active-dot" aria-hidden="true"></span>
+        </button>
       </div>
+
+      <!-- ════ FILTER DRAWER ════ -->
+      <div class="filter-backdrop hidden" id="filter-backdrop" aria-hidden="true"></div>
+
+      <aside class="filter-drawer hidden" id="filter-drawer" role="dialog" aria-modal="true" aria-label="Filtros">
+        <!-- Cabecera -->
+        <div class="filter-drawer__header">
+          <span class="filter-drawer__title">Filtrar</span>
+          <button class="filter-drawer__close" id="filter-drawer-close" aria-label="Cerrar filtros">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+          </button>
+        </div>
+
+        <!-- Sección: Género -->
+        <div class="filter-drawer__section">
+          <button class="filter-section-toggle" aria-expanded="true" data-section="genero">
+            Género
+            <svg class="filter-chevron" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor"
+              stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="18 15 12 9 6 15" />
+            </svg>
+          </button>
+          <div class="filter-section-body" id="filter-body-genero">
+            <label class="filter-checkbox-item">
+              <input type="checkbox" name="genero" value="Hombre" id="fcheck-genero-M"> Hombre
+            </label>
+            <label class="filter-checkbox-item">
+              <input type="checkbox" name="genero" value="Mujer" id="fcheck-genero-F"> Mujer
+            </label>
+            <label class="filter-checkbox-item">
+              <input type="checkbox" name="genero" value="Unisex" id="fcheck-genero-U"> Unisex
+            </label>
+            <label class="filter-checkbox-item">
+              <input type="checkbox" name="genero" value="Niños" id="fcheck-genero-N"> Niños
+            </label>
+          </div>
+        </div>
+
+        <!-- Sección: Color (generada dinámicamente) -->
+        <div class="filter-drawer__section">
+          <button class="filter-section-toggle" aria-expanded="true" data-section="color">
+            Color
+            <svg class="filter-chevron" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor"
+              stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="18 15 12 9 6 15" />
+            </svg>
+          </button>
+          <div class="filter-section-body" id="filter-body-color">
+            <!-- inyectado por catalog.js -->
+          </div>
+        </div>
+
+        <!-- Pie: contador + aplicar -->
+        <div class="filter-drawer__footer">
+          <span class="filter-result-count" id="filter-result-count">— productos</span>
+          <button class="btn btn-primary btn-block" id="filter-apply-btn">
+            Mostrar productos
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <line x1="5" y1="12" x2="19" y2="12" />
+              <polyline points="12 5 19 12 12 19" />
+            </svg>
+          </button>
+          <button class="btn btn-ghost btn-block" id="filter-clear-btn" style="margin-top:4px;font-size:13px;">
+            Limpiar filtros
+          </button>
+        </div>
+      </aside>
 
       <!-- Grid de productos -->
       <div id="product-grid" class="product-grid" role="list" aria-label="Catálogo de productos">
@@ -70,9 +141,13 @@
 
       <!-- Estado vacío (búsqueda sin resultados) -->
       <div id="empty-state" class="empty-state hidden" role="status" aria-live="polite">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <circle cx="11" cy="11" r="8" />
+          <line x1="21" y1="21" x2="16.65" y2="16.65" />
+        </svg>
         <p class="empty-state__title">Sin resultados</p>
-        <p class="empty-state__subtitle" id="empty-state-msg">No encontramos productos que coincidan con tu búsqueda.</p>
+        <p class="empty-state__subtitle" id="empty-state-msg">No encontramos productos que coincidan con tu búsqueda.
+        </p>
         <button class="btn btn-ghost" id="clear-search-btn">Ver todos los productos</button>
       </div>
 
@@ -95,7 +170,11 @@
         <ul>
           <li>
             <a href="mailto:felipeprono@gmail.com" aria-label="Enviar email">
-              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+                <polyline points="22,6 12,13 2,6" />
+              </svg>
               felipeprono@gmail.com
             </a>
           </li>
@@ -108,13 +187,21 @@
         <ul>
           <li>
             <a href="#" aria-label="Instagram de Lana y Lino">
-              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
+                <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
+                <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
+              </svg>
               @lanaylino
             </a>
           </li>
           <li>
             <a href="#" aria-label="Facebook de Lana y Lino">
-              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
+              </svg>
               Lana &amp; Lino
             </a>
           </li>
@@ -135,4 +222,5 @@
   <script src="js/app.js"></script>
   <script src="js/catalog.js"></script>
 </body>
+
 </html>

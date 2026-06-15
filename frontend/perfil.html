@@ -148,18 +148,34 @@
               <span>Cambiar contraseña <em>(opcional)</em></span>
             </div>
 
-            <!-- Contraseña -->
+            <!-- Contraseña actual -->
+            <div class="form-group">
+              <label class="form-label" for="pf-password-current">Contraseña actual</label>
+              <div class="form-group--icon">
+                <input class="form-input" type="password" id="pf-password-current" name="password-current"
+                  placeholder="Ingresá tu contraseña actual"
+                  autocomplete="current-password" />
+                <svg class="fg-icon" viewBox="0 0 24 24">
+                  <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                  <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                </svg>
+              </div>
+              <div id="err-password-current" class="field-error hidden" role="alert"></div>
+            </div>
+
+            <!-- Nueva Contraseña -->
             <div class="form-group">
               <label class="form-label" for="pf-password">Nueva contraseña</label>
               <div class="form-group--icon">
                 <input class="form-input" type="password" id="pf-password" name="password"
-                  placeholder="Dejá en blanco para no cambiarla"
+                  placeholder="Ingresá la nueva contraseña"
                   autocomplete="new-password" minlength="6" maxlength="20" />
                 <svg class="fg-icon" viewBox="0 0 24 24">
                   <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
                   <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
                 </svg>
               </div>
+              <div id="err-password-new" class="field-error hidden" role="alert"></div>
               <span style="font-size:11px;color:var(--color-mute);padding-left:42px;">Entre 6 y 20 caracteres si la cambiás.</span>
             </div>
 

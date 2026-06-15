@@ -4,12 +4,12 @@
    ============================================================ */
 
 /* ── Estado global de la página ── */
-let productoData   = null;  // array con todos los registros del backend
-let inventario     = [];    // registros agrupados y procesados
-let selectedTalle  = null;  // { talle, idInventario, stock, color }
+let productoData = null;  // array con todos los registros del backend
+let inventario = [];    // registros agrupados y procesados
+let selectedTalle = null;  // { talle, idInventario, stock, color }
 let selectedCuotas = 1;
-let isFav          = false;
-let productId      = null;
+let isFav = false;
+let productId = null;
 
 /* ─── Colores CSS aproximados para los swatches ─── */
 const COLOR_MAP = {
@@ -65,21 +65,21 @@ function renderProduct() {
   // Actualizar título de la página y breadcrumb
   document.title = `${p.producto} — Lana & Lino`;
   document.getElementById('breadcrumb-categoria').textContent = p.categoria || 'Productos';
-  document.getElementById('breadcrumb-nombre').textContent    = p.producto;
+  document.getElementById('breadcrumb-nombre').textContent = p.producto;
 
   // Meta info
   document.getElementById('detail-categoria').textContent = p.categoria || '';
-  document.getElementById('detail-genero').textContent    = generoLabel(p.genero);
-  document.getElementById('detail-nombre').textContent    = p.producto;
+  document.getElementById('detail-genero').textContent = generoLabel(p.genero);
+  document.getElementById('detail-nombre').textContent = p.producto;
   document.getElementById('detail-descripcion').textContent = p.descripcion;
-  document.getElementById('detail-precio').textContent    = window.App.formatPrice(p.precio);
+  document.getElementById('detail-precio').textContent = window.App.formatPrice(p.precio);
 
   // Imagen
   const imgContainer = document.getElementById('product-image-container');
   if (p.ulrImagen) {
     const img = document.createElement('img');
-    img.src   = p.ulrImagen;
-    img.alt   = p.producto;
+    img.src = p.ulrImagen;
+    img.alt = p.producto;
     img.className = 'product-image-main';
     img.onerror = () => {
       imgContainer.innerHTML = `
@@ -97,9 +97,9 @@ function renderProduct() {
 
   // Procesar inventario: agrupar por talle + color
   inventario = productoData.map(row => ({
-    talle      : row.talle,
-    color      : row.color,
-    stock      : Number(row.stock),
+    talle: row.talle,
+    color: row.color,
+    stock: Number(row.stock),
     idInventario: row.idInventario,
   }));
 
@@ -180,7 +180,7 @@ function renderColors() {
  */
 function showTallesPlaceholder() {
   const container = document.getElementById('talle-options');
-  const infoEl    = document.getElementById('talle-info');
+  const infoEl = document.getElementById('talle-info');
   if (container) {
     container.innerHTML = `
       <p style="
@@ -198,7 +198,7 @@ function showTallesPlaceholder() {
 /* ─── Talles ─── */
 function renderTalles(colorFilter = null) {
   const container = document.getElementById('talle-options');
-  const infoEl    = document.getElementById('talle-info');
+  const infoEl = document.getElementById('talle-info');
 
   // Filtrar por color si hay múltiples
   const items = colorFilter
@@ -206,7 +206,7 @@ function renderTalles(colorFilter = null) {
     : inventario;
 
   // Ordenar talles
-  const talleOrder = ['XS','S','M','L','XL','XXL','XXXL'];
+  const talleOrder = ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL'];
   items.sort((a, b) => {
     const ai = talleOrder.indexOf(a.talle.toUpperCase());
     const bi = talleOrder.indexOf(b.talle.toUpperCase());
@@ -240,10 +240,10 @@ function renderTalles(colorFilter = null) {
       btn.classList.add('active');
 
       selectedTalle = {
-        talle       : btn.dataset.talle,
+        talle: btn.dataset.talle,
         idInventario: parseInt(btn.dataset.inventario),
-        stock       : parseInt(btn.dataset.stock),
-        color       : btn.dataset.color,
+        stock: parseInt(btn.dataset.stock),
+        color: btn.dataset.color,
       };
 
       // Mostrar stock
@@ -281,7 +281,7 @@ function initCuotas(precio) {
 function updateCuotasResult(precio, cuotas, el) {
   const precioCuota = window.App.calcCuota(precio, cuotas);
   const recargos = { 1: 0, 3: 0, 6: 10, 9: 18, 12: 25 };
-  const recargo  = recargos[cuotas] || 0;
+  const recargo = recargos[cuotas] || 0;
 
   if (cuotas === 1) {
     el.innerHTML = `<strong>${window.App.formatPrice(precio)}</strong> al contado — Sin interés`;
@@ -331,7 +331,7 @@ async function handleAddToCart() {
   if (!selectedTalle) return;
 
   const idInventario = selectedTalle.idInventario;
-  const idUsuario    = window.Auth.getUserId();
+  const idUsuario = window.Auth.getUserId();
 
   btn.disabled = true;
   btn.textContent = 'Agregando…';
@@ -391,7 +391,7 @@ function updateFavButton() {
 async function handleToggleFav() {
   const btn = document.getElementById('btn-fav');
   const idProducto = parseInt(productId);
-  const idUsuario  = window.Auth.getUserId();
+  const idUsuario = window.Auth.getUserId();
 
   btn.disabled = true;
 

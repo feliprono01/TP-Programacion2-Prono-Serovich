@@ -23,10 +23,10 @@ document.addEventListener('DOMContentLoaded', async () => {
    CARGAR CARRITO
 ═══════════════════════════════════════════ */
 async function loadCart() {
-  const loader   = document.getElementById('cart-loader');
-  const listEl   = document.getElementById('cart-items-list');
-  const emptyEl  = document.getElementById('cart-empty');
-  const summaryEl= document.getElementById('cart-summary');
+  const loader = document.getElementById('cart-loader');
+  const listEl = document.getElementById('cart-items-list');
+  const emptyEl = document.getElementById('cart-empty');
+  const summaryEl = document.getElementById('cart-summary');
 
   try {
     const idUsuario = window.Auth.getUserId();
@@ -61,6 +61,13 @@ async function loadCart() {
 /* ═══════════════════════════════════════════
    RENDERIZADO
 ═══════════════════════════════════════════ */
+/* ── Helper: reemplaza imagen rota con placeholder ── */
+function cartImgFallback(el) {
+  el.outerHTML = `<div class="cart-item__img-placeholder">
+    <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+  </div>`;
+}
+
 function renderCartItems(container) {
   const count = document.getElementById('cart-item-count');
   count.textContent = `(${cartItems.length} ${cartItems.length === 1 ? 'producto' : 'productos'})`;
@@ -71,7 +78,7 @@ function renderCartItems(container) {
       <!-- Imagen -->
       ${item.urlImagen
         ? `<img class="cart-item__img" src="${item.urlImagen}" alt="${item.producto}"
-               loading="lazy" onerror="this.outerHTML='<div class=\\'cart-item__img-placeholder\\'><svg viewBox=\\"0 0 24 24\\"><rect x=\\"3\\" y=\\"3\\" width=\\"18\\" height=\\"18\\" rx=\\"2\\"/><circle cx=\\"8.5\\" cy=\\"8.5\\" r=\\"1.5\\"/><polyline points=\\"21 15 16 10 5 21\\"/></svg></div>'">`
+               loading="lazy" onerror="cartImgFallback(this)">`
         : `<div class="cart-item__img-placeholder">
              <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
            </div>`
@@ -238,7 +245,7 @@ function bindPaymentEvents() {
   if (cardExpiry) {
     cardExpiry.addEventListener('input', () => {
       let v = cardExpiry.value.replace(/\D/g, '').slice(0, 4);
-      if (v.length >= 3) v = v.slice(0,2) + '/' + v.slice(2);
+      if (v.length >= 3) v = v.slice(0, 2) + '/' + v.slice(2);
       cardExpiry.value = v;
       validatePayForm();
     });
@@ -271,22 +278,22 @@ function bindPaymentEvents() {
 
 /* ── Validación del formulario de pago ── */
 function validatePayForm() {
-  const payBtn   = document.getElementById('btn-pay');
-  const typeVal  = document.getElementById('payment-type')?.value;
-  const needsCard= ['debito', 'credito'].includes(typeVal);
+  const payBtn = document.getElementById('btn-pay');
+  const typeVal = document.getElementById('payment-type')?.value;
+  const needsCard = ['debito', 'credito'].includes(typeVal);
 
   if (!typeVal) { payBtn.disabled = true; return; }
 
   if (needsCard) {
-    const num    = document.getElementById('card-number')?.value.replace(/\s/g, '');
+    const num = document.getElementById('card-number')?.value.replace(/\s/g, '');
     const expiry = document.getElementById('card-expiry')?.value;
-    const cvv    = document.getElementById('card-cvv')?.value;
-    const name   = document.getElementById('card-name')?.value.trim();
+    const cvv = document.getElementById('card-cvv')?.value;
+    const name = document.getElementById('card-name')?.value.trim();
 
     const valid = num?.length >= 16 &&
-                  /^\d{2}\/\d{2}$/.test(expiry) &&
-                  cvv?.length >= 3 &&
-                  name?.length >= 2;
+      /^\d{2}\/\d{2}$/.test(expiry) &&
+      cvv?.length >= 3 &&
+      name?.length >= 2;
     payBtn.disabled = !valid;
   } else {
     payBtn.disabled = false;
@@ -303,7 +310,7 @@ function handlePay(e) {
   // Simular demora de procesamiento
   setTimeout(() => {
     const session = window.Auth.get();
-    const nombre  = session ? session.nombre : 'Cliente';
+    const nombre = session ? session.nombre : 'Cliente';
     document.getElementById('success-name').textContent = nombre;
     document.getElementById('success-overlay').classList.add('open');
   }, 1200);
