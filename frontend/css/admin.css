@@ -563,6 +563,195 @@
 .edit-panel { margin-top: var(--spacing-xl); }
 .edit-panel.hidden { display: none; }
 
+/* ── Card de edición — header con pill ── */
+.edit-card__header {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  flex-wrap: wrap;
+}
+
+.edit-card__header-text {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Pill "Stand-by" en el header */
+.edit-stanby-pill {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 10px;
+  font-weight: var(--fw-bold);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 4px 10px;
+  border-radius: 99px;
+  background-color: rgba(180, 83, 9, .10);
+  color: #b45309;
+  border: 1px solid rgba(180, 83, 9, .22);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+[data-theme="dark"] .edit-stanby-pill {
+  background-color: rgba(180, 83, 9, .18);
+  border-color: rgba(180, 83, 9, .35);
+}
+
+/* ── Grid de campos de edición ── */
+.edit-fields-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-md);
+}
+
+.edit-field-full {
+  grid-column: 1 / -1;
+}
+
+/* ── Labels con íconos ── */
+.edit-fields-grid .form-label {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: var(--fs-small);
+  font-weight: var(--fw-semibold);
+  color: var(--color-mute);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 6px;
+}
+
+.edit-fields-grid .form-label svg {
+  stroke: var(--color-mute);
+  flex-shrink: 0;
+  transition: stroke var(--transition-fast);
+}
+
+.edit-fields-grid .form-group:focus-within .form-label,
+.edit-fields-grid .form-group:focus-within .form-label svg {
+  color: var(--color-ink);
+  stroke: var(--color-ink);
+}
+
+/* ── Banner de stand-by ── */
+.edit-stanby-notice {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-md) var(--spacing-md);
+  background-color: rgba(180, 83, 9, .06);
+  border: 1px solid rgba(180, 83, 9, .20);
+  border-radius: var(--radius-sm);
+  font-size: var(--fs-small);
+  color: #92400e;
+  line-height: 1.55;
+  margin-bottom: var(--spacing-md);
+}
+
+[data-theme="dark"] .edit-stanby-notice {
+  background-color: rgba(180, 83, 9, .12);
+  border-color: rgba(180, 83, 9, .30);
+  color: #fbbf24;
+}
+
+.edit-stanby-notice svg {
+  stroke: currentColor;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.edit-stanby-notice strong {
+  font-weight: var(--fw-bold);
+}
+
+/* ── Acciones del formulario de edición ── */
+.edit-form-actions {
+  gap: var(--spacing-sm);
+  margin-top: 0;
+  padding-top: var(--spacing-md);
+  border-top: 1px solid var(--color-hairline);
+  display: flex;
+  align-items: center;
+}
+
+/* ── Botón guardar deshabilitado ── */
+.edit-save-btn--disabled {
+  opacity: 0.55 !important;
+  cursor: not-allowed !important;
+  pointer-events: none !important;
+  position: relative;
+  display: inline-flex !important;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+.edit-save-btn__badge {
+  font-size: 9px;
+  font-weight: var(--fw-bold);
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  padding: 2px 7px;
+  border-radius: 99px;
+  background-color: rgba(255,255,255,.22);
+  border: 1px solid rgba(255,255,255,.30);
+  margin-left: 2px;
+  white-space: nowrap;
+}
+
+/* ── Botón cancelar con ícono ── */
+.edit-cancel-btn {
+  display: inline-flex !important;
+  align-items: center;
+  gap: 5px;
+}
+
+/* ── Tip card stand-by (sidebar) ── */
+.admin-tip-card--stanby {
+  border-color: rgba(180, 83, 9, .22) !important;
+  background-color: rgba(180, 83, 9, .04);
+}
+
+[data-theme="dark"] .admin-tip-card--stanby {
+  background-color: rgba(180, 83, 9, .10);
+  border-color: rgba(180, 83, 9, .30) !important;
+}
+
+.admin-tip-card__title--stanby {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #b45309;
+}
+
+[data-theme="dark"] .admin-tip-card__title--stanby {
+  color: #fbbf24;
+}
+
+.admin-tip-card__title--stanby svg {
+  stroke: currentColor;
+}
+
+.admin-tip-card--stanby p {
+  color: #92400e;
+}
+
+[data-theme="dark"] .admin-tip-card--stanby p {
+  color: #d97706;
+}
+
+/* ── Responsive del grid de campos ── */
+@media (max-width: 600px) {
+  .edit-fields-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+
+
 /* ════════════════════════════════════════
    SIDEBAR (tips)
    ════════════════════════════════════════ */

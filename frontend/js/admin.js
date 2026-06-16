@@ -890,60 +890,13 @@ function renderEditInventario(rows, productId, idCat) {
 }
 
 /* ── Guardar cambios del producto ── */
-async function handleEditSave(e) {
+/* STAND-BY: El endpoint de modificar producto no existe aún.
+   Esta función no realiza ninguna acción. El botón en el HTML
+   ya está deshabilitado (disabled). Cuando el endpoint esté
+   disponible, restaurar la lógica aquí. */
+function handleEditSave(e) {
   e.preventDefault();
-  clearAdminMsg('edit-msg');
-
-  const productId   = document.getElementById('edit-product-id').value;
-  const nombre      = document.getElementById('e-nombre').value.trim();
-  const descripcion = document.getElementById('e-descripcion').value.trim();
-  const precio      = parseFloat(document.getElementById('e-precio').value);
-  const genero      = document.getElementById('e-genero').value;
-  const id_categoria= parseInt(document.getElementById('e-categoria').value);
-  const imagen      = document.getElementById('e-imagen').value.trim();
-
-  if (!nombre || !descripcion || isNaN(precio) || !genero || !id_categoria) {
-    showAdminMsg('edit-msg', 'error', 'Completá todos los campos obligatorios.');
-    return;
-  }
-
-  const saveBtn = document.getElementById('edit-save-btn');
-  setLoadingBtn(saveBtn, true, 'Guardando…');
-
-  try {
-    // El backend no tiene endpoint de modificar producto genérico,
-    // pero usa modificarStock. Para los datos del producto usamos cargarProducto
-    // (según el README no hay un endpoint explícito de modificar producto).
-    // Dado que el backend no provee un endpoint de modificar producto,
-    // lo que hacemos es notificar al usuario de que se guardaron los cambios
-    // visualmente, y actualizamos el cache local.
-
-    // Intentar con cargarProducto (algunos backends lo reemplaza con un update)
-    // En caso de que no exista "modificarProducto", mostraremos un mensaje apropiado.
-    const res = await window.Api.cargarProducto({
-      nombre, descripcion, precio, genero, id_categoria,
-      imagen: imagen || ''
-    });
-
-    // Si tiene exito, actualizar cache
-    const idx = todosLosProductos.findIndex(p => String(p.idProducto || p.id) === String(productId));
-    if (idx !== -1) {
-      todosLosProductos[idx] = {
-        ...todosLosProductos[idx],
-        producto: nombre, descripcion, precio, genero, id_categoria,
-        ulrImagen: imagen
-      };
-    }
-
-    showAdminMsg('edit-msg', 'success', '¡Cambios guardados correctamente!');
-    document.getElementById('edit-product-name').textContent = `Editando: ${nombre}`;
-    window.App.showToast('Producto actualizado', 'success');
-
-  } catch (err) {
-    showAdminMsg('edit-msg', 'error', 'Error de conexión. Verificá el servidor.');
-  } finally {
-    setLoadingBtn(saveBtn, false, 'Guardar cambios');
-  }
+  // No-op intencional — funcionalidad en stand-by.
 }
 
 /* ════════════════════════════════════════
