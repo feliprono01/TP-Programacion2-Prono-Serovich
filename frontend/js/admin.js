@@ -697,8 +697,12 @@ function renderEditInventario(rows, productId) {
     list.appendChild(div);
 
     // Evento "OK" para modificar stock
-    div.querySelector('.btn-update').addEventListener('click', async (e) => {
-      const invId = e.currentTarget.dataset.invId;
+    const btnUpdate = div.querySelector('.btn-update');
+    btnUpdate.addEventListener('click', async (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      const btn = e.currentTarget;
+      const invId = btn.dataset.invId;
       const inputEl = div.querySelector(`input[data-inv-id="${invId}"]`);
       const newStock = parseInt(inputEl.value);
 
@@ -707,27 +711,28 @@ function renderEditInventario(rows, productId) {
         return;
       }
 
-      e.currentTarget.textContent = '…';
-      e.currentTarget.disabled = true;
+      btn.textContent = '…';
+      btn.disabled = true;
 
       try {
         const res = await window.Api.modificarStock(parseInt(invId), newStock);
         if (res.codigo === 200) {
           window.App.showToast('Stock actualizado', 'success');
-          e.currentTarget.textContent = '✓';
+          btn.textContent = '✓';
           setTimeout(() => {
-            e.currentTarget.textContent = 'OK';
-            e.currentTarget.disabled = false;
+            btn.textContent = 'OK';
+            btn.disabled = false;
           }, 1500);
         } else {
+          // El backend devuelve -1 si affectedRows es 0 (ej. si el stock ya era ese mismo número) o si hay otro error.
           window.App.showToast('Error al actualizar el stock.', 'error');
-          e.currentTarget.textContent = 'OK';
-          e.currentTarget.disabled = false;
+          btn.textContent = 'OK';
+          btn.disabled = false;
         }
       } catch (err) {
         window.App.showToast('Error de conexión.', 'error');
-        e.currentTarget.textContent = 'OK';
-        e.currentTarget.disabled = false;
+        btn.textContent = 'OK';
+        btn.disabled = false;
       }
     });
   });
