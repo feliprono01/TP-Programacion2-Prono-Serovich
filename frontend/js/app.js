@@ -403,11 +403,29 @@ function imgPlaceholder() {
 }
 
 /* ════════════════════════════════════════
+   VERIFICACIÓN PERIÓDICA DE SESIÓN
+   ════════════════════════════════════════ */
+
+/**
+ * Chequea cada 60 segundos si el token sigue siendo válido.
+ * Si expiró, expira la sesión y redirige al login.
+ */
+function startSessionWatcher() {
+  setInterval(() => {
+    // Si hay sesión guardada pero el token ya expiró → redirigir al login
+    if (window.Auth.get() && !window.Auth.isLoggedIn()) {
+      window.Auth.expire();
+    }
+  }, 60_000); // cada 60 segundos
+}
+
+/* ════════════════════════════════════════
    INICIALIZACIÓN
    ════════════════════════════════════════ */
 document.addEventListener('DOMContentLoaded', () => {
   initTheme();
   renderHeader();
+  startSessionWatcher();
 });
 
 // Exponer globalmente lo que otras páginas necesitan

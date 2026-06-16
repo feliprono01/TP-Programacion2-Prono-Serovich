@@ -18,15 +18,24 @@ const Api = {
     return headers;
   },
 
-  /** Helper interno: fetch + parse + check codigo */
+  /** Helper interno: fetch + parse + check http status */
   async _req(url, options = {}) {
     const res = await fetch(`${API_BASE}${url}`, options);
+
+    // Token expirado o inválido según el backend → cerrar sesión y redirigir
+    if ((res.status === 401 || res.status === 403) && window.Auth.get()) {
+      window.Auth.expire();
+      return;
+    }
+
     if (!res.ok) {
       const text = await res.text();
       throw new Error(text || `HTTP ${res.status}`);
     }
     return res.json();
   },
+
+
 
   /* ── AUTH ── */
   async login(email, password) {

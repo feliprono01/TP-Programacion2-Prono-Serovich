@@ -155,6 +155,7 @@ async function handleRemove(idInventario, btn) {
         listEl.innerHTML = '';
         emptyEl.classList.remove('hidden');
         summaryEl.style.display = 'none';
+        document.querySelector('.cart-page-layout').style.display = 'block';
         document.getElementById('cart-item-count').textContent = '';
       } else {
         renderCartItems(listEl);

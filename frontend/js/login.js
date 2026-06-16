@@ -16,8 +16,21 @@ document.addEventListener('DOMContentLoaded', () => {
   // Tabs
   initTabs();
 
-  // Leer parámetro de URL ?tab=register
+  // Leer parámetros de URL
   const params = new URLSearchParams(window.location.search);
+
+  // Mostrar aviso si la sesión expiró o el browser fue reiniciado
+  if (params.get('expired') === '1') {
+    const errEl = document.getElementById('login-error');
+    if (errEl) {
+      errEl.textContent = 'Tu sesión expiró. Por favor, iniciá sesión nuevamente.';
+      errEl.style.display      = 'block';
+      errEl.style.backgroundColor = 'rgba(230, 92, 0, .08)';
+      errEl.style.borderColor     = 'rgba(230, 92, 0, .30)';
+      errEl.style.color           = '#c45000';
+    }
+  }
+
   if (params.get('tab') === 'register') {
     switchTab('register');
   }

@@ -35,9 +35,10 @@ document.addEventListener('DOMContentLoaded', () => {
 /* ─────────────────────────────────────
    Estado de filtros
 ───────────────────────────────────── */
-let allProducts   = [];
-let activeFilters = { generos: [], colores: [], categoria: 'all', q: '' };
-let userFavorites = [];
+let allProducts    = [];
+let activeFilters  = { generos: [], colores: [], categoria: 'all', q: '' };
+let userFavorites  = [];
+let productColorMap = {}; // idProducto (string) → Set<color>
 
 /* ─────────────────────────────────────
    Carga de productos
@@ -60,7 +61,10 @@ async function loadProducts(initialQ = null, initialCat = null) {
       } catch (e) { /* silencioso */ }
     }
 
-    buildColorFilterOptions(allProducts);
+    // Cargar colores desde el detalle de cada producto en paralelo.
+    // El endpoint /obtenerProductos no incluye JOIN con inventario (sin color),
+    // por lo que se hace un fetch individual por producto para extraer colores únicos.
+    await loadColorOptions(allProducts);
 
     if (initialQ)   activeFilters.q         = initialQ;
     if (initialCat) activeFilters.categoria  = initialCat;
@@ -81,6 +85,39 @@ async function loadProducts(initialQ = null, initialCat = null) {
   }
 }
 
+/**
+ * Hace fetch del detalle de cada producto en paralelo para extraer los colores
+ * del inventario (ya que /obtenerProductos no incluye JOIN con inventario).
+ * Construye productColorMap: idProducto → Set<color>, usado en renderGrid.
+ */
+async function loadColorOptions(productos) {
+  const ids = [...new Set(productos.map(p => p.idProducto).filter(Boolean))];
+
+  const results = await Promise.allSettled(
+    ids.map(id => window.Api.obtenerDatosProducto(id).then(res => ({ id, res })))
+  );
+
+  const coloresSet = new Set();
+  productColorMap  = {};
+
+  results.forEach(r => {
+    if (r.status === 'fulfilled' && r.value?.res?.payload) {
+      const idStr = String(r.value.id);
+      productColorMap[idStr] = new Set();
+      r.value.res.payload.forEach(item => {
+        if (item.color) {
+          const color = item.color.trim();
+          coloresSet.add(color);
+          productColorMap[idStr].add(color);
+        }
+      });
+    }
+  });
+
+  buildColorFilterOptions([...coloresSet].sort());
+}
+
+
 /* ─────────────────────────────────────
    Renderizado del grid
 ───────────────────────────────────── */
@@ -95,13 +132,26 @@ function renderGrid() {
     const matchQ     = !activeFilters.q || p.producto.toLowerCase().includes(activeFilters.q.toLowerCase());
     const matchGen   = activeFilters.generos.length === 0 || activeFilters.generos.includes(p.genero);
     const matchCat   = activeFilters.categoria === 'all' || String(p.idCategoria) === String(activeFilters.categoria);
-    const matchColor = activeFilters.colores.length === 0 || (p.color && activeFilters.colores.includes(p.color));
+    const prodColors = productColorMap[String(p.idProducto)];
+    const matchColor  = activeFilters.colores.length === 0 ||
+      (prodColors && activeFilters.colores.some(c => prodColors.has(c)));
     return matchQ && matchGen && matchCat && matchColor;
   });
 
   // Heading dinámico
   if (activeFilters.q) {
-    if (heading) heading.textContent = `Resultados para "${activeFilters.q}"`;
+    if (heading) heading.innerHTML = `
+      Resultados para &ldquo;${activeFilters.q}&rdquo;
+      <button class="search-clear-btn" id="search-clear-btn"
+              aria-label="Limpiar búsqueda" title="Limpiar búsqueda">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <line x1="18" y1="6" x2="6" y2="18"/>
+          <line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>`;
+    // Evento del botón × (se inyecta cada vez que se renderiza)
+    const clearBtn = document.getElementById('search-clear-btn');
+    if (clearBtn) clearBtn.addEventListener('click', () => window.handleSearch(''));
   } else if (activeFilters.categoria !== 'all') {
     const cat = allProducts.find(p => String(p.idCategoria) === String(activeFilters.categoria));
     if (heading) heading.textContent = cat ? cat.categoria : 'Categoría';
@@ -206,20 +256,24 @@ function renderProductCard(p) {
 /* ─────────────────────────────────────
    FILTER DRAWER
 ───────────────────────────────────── */
-function buildColorFilterOptions(productos) {
+function buildColorFilterOptions(colores) {
   const container = document.getElementById('filter-body-color');
   if (!container) return;
 
-  const colores = [...new Set(
-    productos.flatMap(p => p.color ? [p.color] : []).filter(Boolean)
-  )].sort();
+  if (colores.length === 0) {
+    container.innerHTML = `<p style="padding:8px 0;font-size:13px;color:var(--color-mute);">Sin colores disponibles</p>`;
+    return;
+  }
 
-  container.innerHTML = colores.map(c => `
-    <label class="filter-checkbox-item">
-      <input type="checkbox" name="color" value="${c}" id="fcheck-color-${c.replace(/\s/g,'-')}">
-      ${c}
-    </label>
-  `).join('');
+  // Wrapper con scroll interno para no ocupar todo el drawer
+  container.innerHTML = `<div class="color-scroll-list">${
+    colores.map(c => `
+      <label class="filter-checkbox-item">
+        <input type="checkbox" name="color" value="${c}" id="fcheck-color-${c.replace(/[\s/]/g,'-')}">
+        ${c}
+      </label>`
+    ).join('')
+  }</div>`;
 }
 
 function initFilterDrawer() {
@@ -321,10 +375,11 @@ function initFilterDrawer() {
     const colorChecks  = [...document.querySelectorAll('input[name="color"]:checked')].map(i => i.value);
 
     const count = allProducts.filter(p => {
-      const matchQ     = !activeFilters.q || p.producto.toLowerCase().includes(activeFilters.q.toLowerCase());
-      const matchGen   = generoChecks.length === 0 || generoChecks.includes(p.genero);
-      const matchCat   = activeFilters.categoria === 'all' || String(p.idCategoria) === String(activeFilters.categoria);
-      const matchColor = colorChecks.length === 0 || (p.color && colorChecks.includes(p.color));
+      const matchQ      = !activeFilters.q || p.producto.toLowerCase().includes(activeFilters.q.toLowerCase());
+      const matchGen    = generoChecks.length === 0 || generoChecks.includes(p.genero);
+      const matchCat    = activeFilters.categoria === 'all' || String(p.idCategoria) === String(activeFilters.categoria);
+      const prodColors  = productColorMap[String(p.idProducto)];
+      const matchColor  = colorChecks.length === 0 || (prodColors && colorChecks.some(c => prodColors.has(c)));
       return matchQ && matchGen && matchCat && matchColor;
     }).length;
 

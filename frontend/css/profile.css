@@ -259,6 +259,19 @@
   gap: var(--spacing-md);
 }
 
+/* form-row: auth.css no se carga en perfil.html, así que se define aquí completo */
+.profile-card__body .form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-md);
+}
+
+@media (max-width: 560px) {
+  .profile-card__body .form-row {
+    grid-template-columns: 1fr;
+  }
+}
+
 /* Campo de formulario con ícono */
 .form-group--icon {
   position: relative;
