@@ -260,10 +260,6 @@
                   </div>
                 </div>
               </div>
-              <button class="btn btn-ghost btn-sm" type="submit" id="inv-add-btn-text" style="align-self:flex-start;margin-top:4px;font-size:13px;">
-                <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                Agregar variante
-              </button>
             </form>
             <div class="inventario-actions" style="flex-wrap:wrap;gap:8px;">
               <button class="btn btn-primary" type="button" id="finalizar-btn">✓ Finalizar y cargar otro</button>
@@ -460,17 +456,16 @@
                       </select>
                       <input class="form-input hidden" type="text" id="einv-color-custom" placeholder="Escribí el nuevo color…" style="margin-top:8px;" />
                     </div>
-                    <div class="form-group">
+                    <div class="form-group" style="position:relative">
                       <label class="form-label" for="einv-stock">Stock</label>
-                      <input class="form-input" type="number" id="einv-stock" placeholder="0" min="0" value="10" required />
+                      <div style="display:flex;gap:6px;align-items:center;">
+                        <input class="form-input" type="number" id="einv-stock" placeholder="0" min="0" step="1" value="10" required style="flex:1;" />
+                        <button class="btn btn-secondary" type="submit" id="einv-add-btn" title="Confirmar variante" aria-label="Confirmar y agregar variante" style="height:40px;width:40px;padding:0;flex-shrink:0;display:flex;align-items:center;justify-content:center;">
+                          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                        </button>
+                      </div>
                     </div>
                   </div>
-                  <button class="btn btn-secondary" type="submit">
-                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                      <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
-                    </svg>
-                    Agregar variante
-                  </button>
                 </form>
               </div>
 
@@ -533,11 +528,14 @@
       <ul>
         <li>
           <a href="mailto:felipeprono@gmail.com">
-            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
-              <polyline points="22,6 12,13 2,6"/>
-            </svg>
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
             felipeprono@gmail.com
+          </a>
+        </li>
+        <li>
+          <a href="mailto:emilioserovich@gmail.com">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+            emilioserovich@gmail.com
           </a>
         </li>
       </ul>
@@ -545,8 +543,8 @@
     <div class="footer-col">
       <h4>Redes</h4>
       <ul>
-        <li><a href="#">@lanaylino</a></li>
-        <li><a href="#">Lana &amp; Lino</a></li>
+        <li><a href="#" aria-label="Instagram de Lana y Lino"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg> @lanaylino</a></li>
+        <li><a href="#" aria-label="Facebook de Lana y Lino"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg> Lana &amp; Lino</a></li>
       </ul>
     </div>
   </div>

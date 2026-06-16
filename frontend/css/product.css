@@ -186,17 +186,64 @@
 .stock-low  { color: #f59e0b; }
 .stock-none { color: var(--color-disabled); }
 
-/* Cuotas */
-.cuotas-result {
-  margin-top: var(--spacing-sm);
-  font-size: var(--fs-button);
-  color: var(--color-mute);
-  min-height: 24px;
+/* Tabla informativa de financiación */
+.cuota-info-table {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: var(--spacing-xs);
 }
 
-.cuotas-result strong {
+.cuota-info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px var(--spacing-sm);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  font-size: var(--fs-small);
+  gap: var(--spacing-sm);
+  flex-wrap: wrap;
+}
+
+.cuota-info-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--color-mute);
+  flex-wrap: wrap;
+}
+
+.cuota-info-price {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+.cuota-info-price strong {
   color: var(--color-ink);
   font-weight: var(--fw-semibold);
+  font-size: var(--fs-body);
+}
+
+.cuota-total {
+  font-size: 11px;
+  color: var(--color-mute);
+}
+
+/* Badges de interés */
+.cuota-badge {
+  font-size: inherit;
+  font-weight: var(--fw-semibold);
+}
+
+.cuota-badge--free {
+  color: var(--color-success);
+}
+
+.cuota-badge--interest {
+  color: var(--color-disabled);
 }
 
 /* Color badge */

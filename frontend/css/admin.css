@@ -1064,6 +1064,9 @@
   overflow: hidden;
   text-overflow: ellipsis;
   cursor: pointer;
+  /* Quitar la flecha SVG heredada de .form-select */
+  background-image: none;
+  padding-right: var(--spacing-md);
 }
 
 .multiselect-trigger::after {
@@ -1082,20 +1085,14 @@
 }
 
 .multiselect-options {
-  position: absolute;
-  top: 100%;
-  left: 0;
-  right: 0;
-  margin-top: 4px;
+  /* La posición (fixed) y coordenadas se inyectan por JS (setupMultiselect) */
   background-color: var(--color-canvas);
   border: 1.5px solid var(--color-hairline);
   border-radius: var(--radius-sm);
   box-shadow: var(--shadow-md);
-  z-index: 20;
-  max-height: 220px;
+  max-height: 320px;
   overflow-y: auto;
-  padding: var(--spacing-xs);
-  padding-bottom: 8px;
+  padding: var(--spacing-xs) var(--spacing-xs) 8px;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;

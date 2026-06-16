@@ -261,36 +261,50 @@ function renderTalles(colorFilter = null) {
   });
 }
 
-/* ─── Cuotas ─── */
+/* ─── Cuotas (sección informativa) ─── */
 function initCuotas(precio) {
-  const resultEl = document.getElementById('cuotas-result');
+  const section = document.getElementById('cuotas-section');
+  if (!section) return;
 
-  // Renderizar 1 cuota inicial
-  updateCuotasResult(precio, 1, resultEl);
+  const opciones = [
+    { cuotas: 1,  label: 'Contado / 1 pago', factor: 1,    recargo: 0  },
+    { cuotas: 3,  label: '3 cuotas',          factor: 1,    recargo: 0  },
+    { cuotas: 6,  label: '6 cuotas',          factor: 1.10, recargo: 10 },
+    { cuotas: 9,  label: '9 cuotas',          factor: 1.18, recargo: 18 },
+    { cuotas: 12, label: '12 cuotas',         factor: 1.25, recargo: 25 },
+  ];
 
-  document.querySelectorAll('.cuota-chip').forEach(chip => {
-    chip.addEventListener('click', () => {
-      document.querySelectorAll('.cuota-chip').forEach(c => c.classList.remove('active'));
-      chip.classList.add('active');
-      selectedCuotas = parseInt(chip.dataset.cuotas);
-      updateCuotasResult(precio, selectedCuotas, resultEl);
-    });
-  });
-}
+  const rows = opciones.map(op => {
+    const totalConRecargo = Math.round(precio * op.factor);
+    const precioCuota     = Math.ceil(totalConRecargo / op.cuotas);
+    const sinInteres      = op.recargo === 0;
 
-function updateCuotasResult(precio, cuotas, el) {
-  const precioCuota = window.App.calcCuota(precio, cuotas);
-  const recargos = { 1: 0, 3: 0, 6: 10, 9: 18, 12: 25 };
-  const recargo = recargos[cuotas] || 0;
+    const badgeHTML = sinInteres
+      ? `<span class="cuota-badge cuota-badge--free">Sin interés</span>`
+      : `<span class="cuota-badge cuota-badge--interest">+${op.recargo}%</span>`;
 
-  if (cuotas === 1) {
-    el.innerHTML = `<strong>${window.App.formatPrice(precio)}</strong> al contado — Sin interés`;
-  } else if (recargo === 0) {
-    el.innerHTML = `<strong>${cuotas}x ${window.App.formatPrice(precioCuota)}</strong> — Sin interés`;
-  } else {
-    const total = precioCuota * cuotas;
-    el.innerHTML = `<strong>${cuotas}x ${window.App.formatPrice(precioCuota)}</strong> — Total: ${window.App.formatPrice(total)} (+${recargo}% interés)`;
-  }
+    const cuotaText = op.cuotas === 1
+      ? `<strong>${window.App.formatPrice(precio)}</strong>`
+      : `<strong>${op.cuotas}x ${window.App.formatPrice(precioCuota)}</strong>`;
+
+    const totalText = op.cuotas === 1
+      ? `<span class="cuota-total">${window.App.formatPrice(precio)}</span>`
+      : `<span class="cuota-total">${window.App.formatPrice(totalConRecargo)} total</span>`;
+
+    return `
+      <div class="cuota-info-row">
+        <span class="cuota-info-label">${op.label} ${badgeHTML}</span>
+        <span class="cuota-info-price">${cuotaText} ${totalText}</span>
+      </div>`;
+  }).join('');
+
+  section.innerHTML = `
+    <p class="product-section-label" style="margin-bottom:var(--spacing-sm);">
+      Financiación
+      <span style="font-size:11px;font-weight:400;color:var(--color-mute);margin-left:6px;">solo informativo — elegí el método al pagar</span>
+    </p>
+    <div class="cuota-info-table">${rows}</div>
+  `;
 }
 
 /* ─── Botón Carrito ─── */

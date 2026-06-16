@@ -200,15 +200,6 @@ function initCargarForm() {
   document.getElementById('cargar-form').addEventListener('submit', handleCargarProducto);
   document.getElementById('inventario-form').addEventListener('submit', handleAgregarInventario);
   document.getElementById('finalizar-btn').addEventListener('click', handleFinalizar);
-
-  // Botón de texto "Agregar variante" (fuera del form) — mismo comportamiento que ✓
-  const textBtn = document.getElementById('inv-add-btn-text');
-  if (textBtn) {
-    textBtn.addEventListener('click', (e) => {
-      e.preventDefault();
-      document.getElementById('inventario-form').dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
-    });
-  }
 }
 
 /* Paso 1: solo valida y avanza al Paso 2. NO toca la BD. */
@@ -288,9 +279,29 @@ function handleAgregarInventario(e) {
     return;
   }
 
+  let added = 0, merged = 0;
   talles.forEach(talle => {
-    pendingVariantes.push({ talle, color, stock });
-    appendInventarioRow('inventario-list', { talle, color, stock });
+    const existing = pendingVariantes.find(v => v.talle === talle && v.color === color);
+    if (existing) {
+      // Sumar stock a la variante ya existente
+      const oldStock = existing.stock;
+      existing.stock += stock;
+      merged++;
+      // Actualizar la fila visible en la lista
+      const list = document.getElementById('inventario-list');
+      const rows = list.querySelectorAll('.inventario-row');
+      rows.forEach(row => {
+        if (row.dataset.talle === talle && row.dataset.color === color && parseInt(row.dataset.stock) === oldStock) {
+          row.dataset.stock = existing.stock;
+          const stockSpan = row.querySelector('.inventario-row__stock');
+          if (stockSpan) stockSpan.textContent = `${existing.stock} u.`;
+        }
+      });
+    } else {
+      pendingVariantes.push({ talle, color, stock });
+      appendInventarioRow('inventario-list', { talle, color, stock });
+      added++;
+    }
   });
 
   resetMultiselect('inv');
@@ -299,7 +310,13 @@ function handleAgregarInventario(e) {
   document.getElementById('inv-color-custom').value = '';
   document.getElementById('inv-stock').value = '10';
 
-  window.App.showToast(`${talles.length} variante${talles.length !== 1 ? 's' : ''} agregada${talles.length !== 1 ? 's' : ''} a la lista`, 'info');
+  if (merged > 0 && added === 0) {
+    window.App.showToast(`Stock sumado a ${merged} variante${merged !== 1 ? 's' : ''} existente${merged !== 1 ? 's' : ''}`, 'info');
+  } else if (merged > 0) {
+    window.App.showToast(`${added} variante${added !== 1 ? 's' : ''} agregada${added !== 1 ? 's' : ''}, ${merged} actualizada${merged !== 1 ? 's' : ''}`, 'info');
+  } else {
+    window.App.showToast(`${added} variante${added !== 1 ? 's' : ''} agregada${added !== 1 ? 's' : ''} a la lista`, 'info');
+  }
 }
 
 function appendInventarioRow(containerId, { talle, color, stock }) {
@@ -648,7 +665,7 @@ async function loadProductForEdit(productId) {
     renderMultiselectOptions('einv', getTallesForCategory(idCat));
 
     // Renderizar inventario
-    renderEditInventario(rows, productId);
+    renderEditInventario(rows, productId, idCat);
 
     // Eventos del formulario de edición
     const editForm = document.getElementById('edit-form');
@@ -665,7 +682,7 @@ async function loadProductForEdit(productId) {
   }
 }
 
-function renderEditInventario(rows, productId) {
+function renderEditInventario(rows, productId, idCat) {
   const list = document.getElementById('edit-inventario-list');
   list.innerHTML = '';
 
@@ -742,8 +759,14 @@ function renderEditInventario(rows, productId) {
   const newInvForm  = editInvForm.cloneNode(true);
   editInvForm.parentNode.replaceChild(newInvForm, editInvForm);
 
+  // Restablecer botón ✓ por si quedó deshabilitado del ciclo anterior (cloneNode copia el estado DOM)
+  const clonedBtnCheck = newInvForm.querySelector('#einv-add-btn');
+  if (clonedBtnCheck) { clonedBtnCheck.disabled = false; clonedBtnCheck.style.opacity = ''; }
+
   // Re-vincular los escuchadores de eventos para los nuevos elementos clonados
   setupMultiselect('einv');
+  // setupMultiselect resetea las opciones a TALLES_ROPA; re-aplicar los talles correctos según categoría
+  renderMultiselectOptions('einv', getTallesForCategory(idCat));
   setupColorSelect('einv');
 
   // Asegurar que el multiselect de edición se resetee para este producto
@@ -784,37 +807,84 @@ function renderEditInventario(rows, productId) {
       return;
     }
 
-    const submitBtn = newInvForm.querySelector('button[type="submit"]');
-    setLoadingBtn(submitBtn, true, 'Agregando variantes…');
+    // Deshabilitar botón ✓ sin destruir su SVG
+    const btnCheck = newInvForm.querySelector('#einv-add-btn');
+    if (btnCheck) { btnCheck.disabled = true; btnCheck.style.opacity = '0.6'; }
 
     try {
-      const results = await Promise.all(talles.map(talle =>
-        window.Api.crearInventario({
-          talle, color, stock, id_producto: parseInt(productId)
-        })
-      ));
+      let added = 0, merged = 0;
 
-      const failed = results.filter(res => res.codigo !== 200);
-      if (failed.length > 0) {
-        window.App.showToast('Error al agregar algunas variantes.', 'error');
-        return;
+      await Promise.all(talles.map(async talle => {
+        // Buscar si ya existe esa combinación talle+color en el inventario actual (snapshot local)
+        const existing = rows.find(r =>
+          String(r.talle).trim().toLowerCase() === String(talle).trim().toLowerCase() &&
+          String(r.color).trim().toLowerCase() === String(color).trim().toLowerCase()
+        );
+
+        if (existing) {
+          // Ya existe en snapshot → sumar stock usando modificarStock
+          const nuevoStock = (parseInt(existing.stock) || 0) + stock;
+          const res = await window.Api.modificarStock(parseInt(existing.idInventario), nuevoStock);
+          if (res.codigo === 200) {
+            existing.stock = nuevoStock;
+            merged++;
+          } else {
+            throw new Error(`No se pudo actualizar stock de ${talle} ${color}`);
+          }
+        } else {
+          // No está en snapshot → intentar crear
+          const res = await window.Api.crearInventario({
+            talle, color, stock, id_producto: parseInt(productId)
+          });
+
+          if (res.codigo === 200) {
+            added++;
+          } else {
+            // crearInventario falló (posible UNIQUE constraint en BD o snapshot desactualizado).
+            // Consultar el inventario real en la BD para confirmar si ya existe.
+            try {
+              const freshRes = await window.Api.obtenerDatosProducto(productId);
+              const freshRows = (freshRes && freshRes.payload) ? freshRes.payload : [];
+              const freshExisting = freshRows.find(r =>
+                String(r.talle).trim().toLowerCase() === String(talle).trim().toLowerCase() &&
+                String(r.color).trim().toLowerCase() === String(color).trim().toLowerCase()
+              );
+              if (freshExisting) {
+                // Existe en BD pero no estaba en el snapshot → hacer merge
+                const nuevoStock = (parseInt(freshExisting.stock) || 0) + stock;
+                const mergeRes = await window.Api.modificarStock(parseInt(freshExisting.idInventario), nuevoStock);
+                if (mergeRes.codigo === 200) {
+                  // Actualizar también el snapshot local para evitar doble merge en el mismo lote
+                  rows.push({ ...freshExisting, stock: nuevoStock });
+                  merged++;
+                } else {
+                  throw new Error(`No se pudo actualizar stock de ${talle} ${color}`);
+                }
+              } else {
+                throw new Error(`No se pudo crear variante ${talle} ${color}`);
+              }
+            } catch (innerErr) {
+              throw innerErr;
+            }
+          }
+        }
+      }));
+
+      // Recargar el panel de inventario para reflejar cambios
+      await loadProductForEdit(productId);
+
+      if (merged > 0 && added === 0) {
+        window.App.showToast(`Stock sumado a ${merged} variante${merged !== 1 ? 's' : ''} existente${merged !== 1 ? 's' : ''}`, 'success');
+      } else if (merged > 0) {
+        window.App.showToast(`${added} variante${added !== 1 ? 's' : ''} nueva${added !== 1 ? 's' : ''}, ${merged} actualizada${merged !== 1 ? 's' : ''}`, 'success');
+      } else {
+        window.App.showToast(`${added} variante${added !== 1 ? 's' : ''} agregada${added !== 1 ? 's' : ''} exitosamente`, 'success');
       }
 
-      // Recargar el panel de inventario
-      await loadProductForEdit(productId);
-      window.App.showToast('Variantes agregadas exitosamente', 'success');
-
-      // Limpiar selectores
-      resetMultiselect('einv');
-      colorSelect.value = '';
-      document.getElementById('einv-color-custom').classList.add('hidden');
-      document.getElementById('einv-color-custom').value = '';
-      document.getElementById('einv-stock').value = '10';
-
     } catch (err) {
-      window.App.showToast('Error de conexión.', 'error');
-    } finally {
-      setLoadingBtn(submitBtn, false, '+ Agregar variante');
+      window.App.showToast(err.message || 'Error de conexión.', 'error');
+      // Re-habilitar botones si hubo error (loadProductForEdit los re-renderiza en caso de éxito)
+      if (btnCheck) { btnCheck.disabled = false; btnCheck.style.opacity = ''; }
     }
   });
 }
@@ -946,6 +1016,16 @@ function initMultiselectsAndColors() {
     });
   });
 
+  // Cerrar multiselects al hacer scroll (evita que el dropdown fixed flote)
+  window.addEventListener('scroll', () => {
+    document.querySelectorAll('.multiselect-options:not(.hidden)').forEach(options => {
+      options.classList.add('hidden');
+    });
+    document.querySelectorAll('.multiselect-dropdown.open').forEach(dropdown => {
+      dropdown.classList.remove('open');
+    });
+  }, { passive: true });
+
   // Listener para cuando se cambia la categoría en Modificar
   const eCategoria = document.getElementById('e-categoria');
   if (eCategoria) {
@@ -960,16 +1040,26 @@ function setupMultiselect(prefix) {
   const optionsDiv = document.getElementById(`${prefix}-talles-options`);
   const trigger = document.getElementById(`${prefix}-talles-trigger`);
   const dropdown = document.getElementById(`${prefix}-talles-dropdown`);
-  
+
   if (!optionsDiv || !trigger || !dropdown) return;
 
   // Render inicial por defecto a ropa
   renderMultiselectOptions(prefix, TALLES_ROPA);
 
+  // Posicionar con fixed para escapar cualquier overflow:hidden del padre
+  function positionDropdown() {
+    const rect = trigger.getBoundingClientRect();
+    optionsDiv.style.position = 'fixed';
+    optionsDiv.style.top  = (rect.bottom + 4) + 'px';
+    optionsDiv.style.left = rect.left + 'px';
+    optionsDiv.style.width = rect.width + 'px';
+    optionsDiv.style.zIndex = '9999';
+  }
+
   // Toggle dropdown
   trigger.addEventListener('click', (e) => {
     e.stopPropagation();
-    
+
     // Cerrar los demás
     document.querySelectorAll('.multiselect-options').forEach(el => {
       if (el !== optionsDiv) el.classList.add('hidden');
@@ -978,8 +1068,15 @@ function setupMultiselect(prefix) {
       if (el !== dropdown) el.classList.remove('open');
     });
 
-    optionsDiv.classList.toggle('hidden');
-    dropdown.classList.toggle('open');
+    const isOpen = !optionsDiv.classList.contains('hidden');
+    if (isOpen) {
+      optionsDiv.classList.add('hidden');
+      dropdown.classList.remove('open');
+    } else {
+      positionDropdown();
+      optionsDiv.classList.remove('hidden');
+      dropdown.classList.add('open');
+    }
   });
 
   // Manejar el cambio de texto del botón trigger

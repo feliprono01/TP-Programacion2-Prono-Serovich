@@ -210,15 +210,23 @@ function bindPaymentEvents() {
     });
   }
 
-  // Tipo de pago → mostrar/ocultar campos de tarjeta
+  // Tipo de pago → mostrar/ocultar campos de tarjeta, cuotas y resumen de costo
   const typeSelect = document.getElementById('payment-type');
   const cardFields = document.getElementById('card-fields');
+  const cuotasGroup = document.getElementById('cuotas-select-group');
+  const cuotasSelect = document.getElementById('payment-cuotas');
+  const costSummary = document.getElementById('payment-cost-summary');
+
   if (typeSelect) {
     typeSelect.addEventListener('change', () => {
-      const needsCard = ['debito', 'credito'].includes(typeSelect.value);
-      cardFields.classList.toggle('hidden', !needsCard);
+      const val = typeSelect.value;
+      const needsCard = ['debito', 'credito'].includes(val);
+      const isCredito = val === 'credito';
 
-      // Limpiar campos si se ocultan
+      cardFields.classList.toggle('hidden', !needsCard);
+      cuotasGroup.classList.toggle('hidden', !isCredito);
+
+      // Limpiar campos de tarjeta si se ocultan
       if (!needsCard) {
         ['card-number', 'card-expiry', 'card-cvv', 'card-name'].forEach(id => {
           const el = document.getElementById(id);
@@ -226,6 +234,18 @@ function bindPaymentEvents() {
         });
       }
 
+      // Resetear cuotas si no es crédito
+      if (!isCredito && cuotasSelect) cuotasSelect.value = '1';
+
+      updatePaymentCostSummary();
+      validatePayForm();
+    });
+  }
+
+  // Cambio de cuotas → actualizar resumen
+  if (cuotasSelect) {
+    cuotasSelect.addEventListener('change', () => {
+      updatePaymentCostSummary();
       validatePayForm();
     });
   }
@@ -274,6 +294,70 @@ function bindPaymentEvents() {
   if (payForm) {
     payForm.addEventListener('submit', handlePay);
   }
+}
+
+/* ── Resumen de costo según método y cuotas seleccionadas ── */
+function updatePaymentCostSummary() {
+  const costSummary = document.getElementById('payment-cost-summary');
+  const typeVal = document.getElementById('payment-type')?.value;
+  const cuotasVal = parseInt(document.getElementById('payment-cuotas')?.value || '1');
+  if (!costSummary || !typeVal) { costSummary?.classList.add('hidden'); return; }
+
+  const baseTotal = cartItems.reduce((s, i) => s + Number(i.precio), 0);
+  const factores = { 1: 1, 3: 1, 6: 1.10, 9: 1.18, 12: 1.25 };
+  const recargos = { 1: 0, 3: 0, 6: 10,  9: 18,  12: 25  };
+
+  let html = '';
+
+  if (typeVal === 'transferencia') {
+    html = `
+      <div class="cost-summary-row">
+        <span>Pago único — Transferencia</span>
+        <strong>${window.App.formatPrice(baseTotal)}</strong>
+      </div>
+      <p class="cost-summary-note">Sin recargos. Total a transferir: <strong>${window.App.formatPrice(baseTotal)}</strong></p>`;
+  } else if (typeVal === 'debito') {
+    html = `
+      <div class="cost-summary-row">
+        <span>Pago único — Débito</span>
+        <strong>${window.App.formatPrice(baseTotal)}</strong>
+      </div>
+      <p class="cost-summary-note">Sin recargos. Se debitará <strong>${window.App.formatPrice(baseTotal)}</strong> de tu cuenta.</p>`;
+  } else if (typeVal === 'credito') {
+    const factor = factores[cuotasVal] || 1;
+    const recargo = recargos[cuotasVal] || 0;
+    const totalConRecargo = Math.round(baseTotal * factor);
+    const precioCuota = Math.ceil(totalConRecargo / cuotasVal);
+    const sinInteres = recargo === 0;
+
+    const cuotaLabel = cuotasVal === 1
+      ? `1 pago de ${window.App.formatPrice(totalConRecargo)}`
+      : `${cuotasVal} cuotas de ${window.App.formatPrice(precioCuota)}`;
+
+    const interesBadge = sinInteres
+      ? `<span class="cuota-badge cuota-badge--free">Sin interés</span>`
+      : `<span class="cuota-badge cuota-badge--interest">+${recargo}% interés</span>`;
+
+    html = `
+      <div class="cost-summary-row">
+        <span>${cuotaLabel} ${interesBadge}</span>
+        <strong>${window.App.formatPrice(totalConRecargo)}</strong>
+      </div>
+      ${recargo > 0 ? `<p class="cost-summary-note">Total con interés: <strong>${window.App.formatPrice(totalConRecargo)}</strong> (base: ${window.App.formatPrice(baseTotal)})</p>` : ''}`;
+
+    // Actualizar también el gran total visible en la pantalla de pago
+    const paymentTotal = document.getElementById('payment-total');
+    if (paymentTotal) paymentTotal.textContent = window.App.formatPrice(totalConRecargo);
+  }
+
+  // Restaurar total base si no es crédito
+  if (typeVal !== 'credito') {
+    const paymentTotal = document.getElementById('payment-total');
+    if (paymentTotal) paymentTotal.textContent = window.App.formatPrice(baseTotal);
+  }
+
+  costSummary.innerHTML = html;
+  costSummary.classList.remove('hidden');
 }
 
 /* ── Validación del formulario de pago ── */

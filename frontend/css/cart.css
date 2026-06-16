@@ -245,6 +245,53 @@
 
 .card-fields.hidden { display: none; }
 
+/* Resumen de costo según método de pago */
+.payment-cost-summary {
+  background: var(--color-surface);
+  border: 1px solid var(--color-hairline);
+  border-radius: var(--radius-sm);
+  padding: var(--spacing-md);
+  margin: var(--spacing-sm) 0;
+  font-size: var(--fs-small);
+}
+
+.payment-cost-summary.hidden { display: none; }
+
+.cost-summary-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--spacing-sm);
+  flex-wrap: wrap;
+}
+
+.cost-summary-row strong {
+  font-size: var(--fs-body);
+  font-weight: var(--fw-bold);
+  white-space: nowrap;
+}
+
+.cost-summary-note {
+  margin-top: var(--spacing-xs);
+  font-size: 11px;
+  color: var(--color-mute);
+  line-height: 1.5;
+}
+
+/* Badges de interés (compartidos con product.css) */
+.cuota-badge {
+  font-size: inherit;
+  font-weight: var(--fw-semibold);
+}
+
+.cuota-badge--free {
+  color: var(--color-success);
+}
+
+.cuota-badge--interest {
+  color: var(--color-disabled);
+}
+
 /* ════════════════════════════════════════
    ESTADO VACÍO
    ════════════════════════════════════════ */

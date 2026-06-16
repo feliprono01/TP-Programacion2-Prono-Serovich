@@ -69,29 +69,11 @@ function renderHeader() {
     <header class="global-header" id="global-header">
       <div class="header-inner">
 
-        <!-- Izquierda: Buscador + Favoritos + Categorías -->
+        <!-- Izquierda: Categorías + Buscador -->
         <div class="header-left">
-          <div class="search-wrapper" id="search-wrapper">
-            <button class="search-icon-btn" id="search-btn" aria-label="Buscar" title="Buscar">
-              ${SVG.search()}
-            </button>
-            <input
-              class="search-input"
-              id="search-input"
-              type="search"
-              placeholder="Buscar producto..."
-              autocomplete="off"
-              aria-label="Buscar producto"
-            />
-          </div>
-
-          <button class="icon-btn" id="favorites-nav-btn" aria-label="Favoritos" title="Favoritos">
-            ${SVG.heart()}
-          </button>
-
           <div class="dropdown" id="categories-dropdown">
             <button class="dropdown-trigger" id="categories-trigger" aria-label="Categorías">
-              Productos ${SVG.chevronDown()}
+              Categorías ${SVG.chevronDown()}
             </button>
             <div class="dropdown-menu" id="categories-menu" role="menu">
               <button class="dropdown-item" data-category="all" role="menuitem">Todos los productos</button>
@@ -103,6 +85,20 @@ function renderHeader() {
               </div>
             </div>
           </div>
+
+          <div class="search-wrapper" id="search-wrapper">
+            <input
+              class="search-input"
+              id="search-input"
+              type="search"
+              placeholder="Buscar producto..."
+              autocomplete="off"
+              aria-label="Buscar producto"
+            />
+            <button class="search-icon-btn" id="search-btn" aria-label="Buscar" title="Buscar">
+              ${SVG.search()}
+            </button>
+          </div>
         </div>
 
         <!-- Centro: Marca -->
@@ -112,13 +108,17 @@ function renderHeader() {
           </a>
         </div>
 
-        <!-- Derecha: Tema + Perfil + Carrito + Auth + Admin -->
+        <!-- Derecha: Tema + Separador + Favoritos + Perfil + Carrito + Auth + Admin -->
         <div class="header-right">
           <button class="icon-btn" id="theme-toggle" aria-label="Cambiar tema">
             ${SVG.moon()}
           </button>
 
           <div class="header-sep"></div>
+
+          <button class="icon-btn" id="favorites-nav-btn" aria-label="Favoritos" title="Favoritos">
+            ${SVG.heart()}
+          </button>
 
           ${isLogged ? `
             <button class="icon-btn" id="profile-btn" aria-label="Mi perfil" title="Mi perfil">
@@ -165,13 +165,17 @@ function bindHeaderEvents() {
   const themeBtn = document.getElementById('theme-toggle');
   if (themeBtn) themeBtn.addEventListener('click', toggleTheme);
 
-  // Buscador: Enter o clic en lupa
+  // Buscador: Enter, clic en lupa, o vaciado con X
   const searchInput = document.getElementById('search-input');
   const searchBtn   = document.getElementById('search-btn');
 
   if (searchInput) {
     searchInput.addEventListener('keydown', (e) => {
       if (e.key === 'Enter') doSearch(searchInput.value.trim());
+    });
+    // Cuando se borra con la X nativa del input[type=search] o se vacía el campo
+    searchInput.addEventListener('input', () => {
+      if (searchInput.value === '') doSearchReset();
     });
   }
   if (searchBtn) {
@@ -254,6 +258,19 @@ function doSearch(query) {
     window.handleSearch(query);
   } else {
     window.location.href = `index.html?q=${encodeURIComponent(query)}`;
+  }
+}
+
+/* ─ Reset de búsqueda: vuelve a mostrar todos los productos ─ */
+function doSearchReset() {
+  const isOnIndex = window.location.pathname.includes('index.html') ||
+                    window.location.pathname.endsWith('/frontend/') ||
+                    window.location.pathname.endsWith('/frontend');
+
+  if (isOnIndex && typeof window.handleCategoryFilter === 'function') {
+    window.handleCategoryFilter('all'); // Mostrar todos los productos
+  } else if (!isOnIndex) {
+    window.location.href = 'index.html'; // Si está en otra página, volver al catálogo
   }
 }
 
